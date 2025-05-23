@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,7 +39,8 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-4">
+          <ThemeToggle />
           <Link to="/login">
             <Button variant="ghost" size="sm">Login</Button>
           </Link>
@@ -77,6 +79,9 @@ export default function Navbar() {
               <Link to="/dashboard" className="text-sm font-medium text-foreground/80 hover:text-foreground">
                 Dashboard
               </Link>
+              <div className="flex items-center py-2">
+                <ThemeToggle />
+              </div>
               <div className="flex flex-col pt-2 space-y-2">
                 <Link to="/login" className="w-full">
                   <Button variant="ghost" className="w-full">Login</Button>
@@ -92,3 +97,4 @@ export default function Navbar() {
     </header>
   );
 }
+
