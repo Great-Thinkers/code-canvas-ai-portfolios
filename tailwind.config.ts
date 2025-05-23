@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,33 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				brand: {
+					50: '#f0f7ff',
+					100: '#e0eefe',
+					200: '#bae0fd',
+					300: '#7cc8fb',
+					400: '#38aaf6',
+					500: '#138ede',
+					600: '#0970bd',
+					700: '#0c5a9a',
+					800: '#104d7f',
+					900: '#12426a',
+					950: '#0c2a47',
+				},
+				code: {
+					purple: '#8a63d2',
+					blue: '#3b82f6',
+					green: '#10b981',
+					yellow: '#eab308',
+					orange: '#f97316',
+					red: '#ef4444',
 				}
+			},
+			fontFamily: {
+				sans: ['Inter', 'sans-serif'],
+				mono: ['Fira Code', 'monospace'],
+				display: ['Cal Sans', 'Inter', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +111,29 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				'gradient-x': {
+					'0%, 100%': {
+						'background-position': '0% 50%'
+					},
+					'50%': {
+						'background-position': '100% 50%'
+					}
+				},
+				'shimmer': {
+					'0%': {
+						'background-position': '-40rem 0',
+					},
+					'100%': {
+						'background-position': '40rem 0',
+					},
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'gradient-x': 'gradient-x 15s ease infinite',
+				'shimmer': 'shimmer 2s infinite linear',
 			}
 		}
 	},
