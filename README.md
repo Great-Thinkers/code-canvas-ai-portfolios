@@ -1,73 +1,100 @@
-# Welcome to your Lovable project
+# 🧠 AutoDev Portfolio Generator
 
-## Project info
+An AI-powered SaaS application that auto-generates stunning, customizable, and always up-to-date developer portfolios using GitHub and LinkedIn activity. Tailored UI/UX, smart content generation, and seamless deployment.
 
-**URL**: https://lovable.dev/projects/de7210c9-e951-4260-bc1f-98dcb1492353
+---
 
-## How can I edit this code?
+## 🚀 Features
 
-There are several ways of editing your application.
+- 🔗 **GitHub & LinkedIn Integration**
+  - Sync repos, commits, PRs, issues, skills, work history, and more
+- 🧠 **AI-Powered Portfolio Generation**
+  - Auto-generate project descriptions, summaries, skill sections
+- 🎨 **Customizable Themes**
+  - Choose from modern templates based on your dev role (frontend, backend, full-stack, etc.)
+- 📦 **Download or Deploy**
+  - Export as static HTML/CSS or deploy with GitHub Pages, Netlify, or custom domain
+- 💸 **Freemium Model**
+  - Free users: 2 portfolios
+  - Pro users: Unlimited, auto-sync, premium templates
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/de7210c9-e951-4260-bc1f-98dcb1492353) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
+## 🧰 Tech Stack
 
 - Vite
 - TypeScript
 - React
 - shadcn-ui
 - Tailwind CSS
+- Backend: Node.js (Express) or Rust (Axum)
+- Auth: GitHub + LinkedIn OAuth
+- Database: Supabase/PostgreSQL
+- Payments: Stripe
+- AI: OpenAI API / Lovable Dev AI
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/de7210c9-e951-4260-bc1f-98dcb1492353) and click on Share -> Publish.
+## 📦 Getting Started
 
-## Can I connect a custom domain to my Lovable project?
+You can start building in multiple ways:
 
-Yes, you can!
+### 🧠 Use Lovable
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Visit your [Lovable Project](https://lovable.dev/projects/de7210c9-e951-4260-bc1f-98dcb1492353) and start prompting. Changes are auto-committed.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### 💻 Local Development
+
+Ensure you have Node.js & npm installed. [Install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+
+```sh
+# Step 1: Clone the repo
+git clone <YOUR_GIT_URL>
+cd <YOUR_PROJECT_NAME>
+
+# Step 2: Install dependencies
+npm install
+
+# Step 3: Set environment variables
+cp .env.example .env
+# Fill in your API keys and tokens
+
+# Step 4: Run the dev server
+npm run dev
+```
+
+### 🛠 Edit Directly in GitHub
+- Navigate to the file.
+- Click the pencil icon.
+- Commit changes.
+
+### 🚀 Use GitHub Codespaces
+- Click "Code" > "Codespaces" > "New codespace"
+- Edit and push changes directly
+
+---
+
+## 🌐 Live Deployment
+
+Easily deploy by visiting [Lovable Project Settings](https://lovable.dev/projects/de7210c9-e951-4260-bc1f-98dcb1492353) and clicking **Share -> Publish**.
+
+Or use:
+- [Vercel](https://vercel.com)
+- [Netlify](https://netlify.com)
+- GitHub Pages
+
+### 🌍 Custom Domain
+To connect your domain, go to `Project > Settings > Domains` in Lovable.
+More info: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+---
+
+## 🧑‍💻 Contributing
+
+Want to improve this app or add new features? See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+## 📃 License
+
+MIT © [YourName or Organization]
