@@ -49,8 +49,8 @@ Ensure you have Node.js & npm installed. [Install with nvm](https://github.com/n
 
 ```sh
 # Step 1: Clone the repo
-git clone <YOUR_GIT_URL>
-cd <YOUR_PROJECT_NAME>
+git clone <https://github.com/Great-Thinkers/code-canvas-ai-portfolios.git>
+cd <code-canvas-ai-portfolios>
 
 # Step 2: Install dependencies
 npm install
