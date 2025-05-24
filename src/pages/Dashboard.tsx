@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import PortfolioCard from '@/components/dashboard/PortfolioCard';
@@ -7,6 +7,9 @@ import IntegrationCard from '@/components/dashboard/IntegrationCard';
 import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 // Sample data - in a real app this would come from your backend
 const samplePortfolios = [
@@ -28,10 +31,34 @@ const samplePortfolios = [
   },
 ];
 
-export default function Dashboard() {
+function DashboardContent() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [githubConnected, setGithubConnected] = useState(false);
   const [linkedinConnected, setLinkedinConnected] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  useEffect(() => {
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
+
+  const fetchUserProfile = async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching profile:', error);
+    } else {
+      setUserProfile(data);
+    }
+  };
 
   const handleConnectGithub = () => {
     // This would trigger the OAuth flow in a real app
@@ -155,8 +182,8 @@ export default function Dashboard() {
                 <div>
                   <h3 className="text-lg font-medium mb-2">Account Information</h3>
                   <div className="p-4 rounded-lg border border-border bg-muted/50">
-                    <p className="font-medium">John Doe</p>
-                    <p className="text-sm text-muted-foreground mb-2">john.doe@example.com</p>
+                    <p className="font-medium">{userProfile?.full_name || user?.email}</p>
+                    <p className="text-sm text-muted-foreground mb-2">{user?.email}</p>
                     <div className="flex gap-2 text-sm">
                       <button className="text-brand-500 hover:text-brand-600 font-medium">
                         Change email
@@ -175,5 +202,13 @@ export default function Dashboard() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
   );
 }
