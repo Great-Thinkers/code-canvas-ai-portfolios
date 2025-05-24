@@ -83,10 +83,7 @@ Or use:
 - [Netlify](https://netlify.com)
 - GitHub Pages
 
-### 🌍 Custom Domain
-To connect your domain, go to `Project > Settings > Domains` in Lovable.
-More info: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
-
+### 🚀 Deploy to github pages
 ---
 
 ## 🧑‍💻 Contributing
