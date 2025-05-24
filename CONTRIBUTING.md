@@ -74,7 +74,6 @@ Thanks for your interest in contributing to **Code Canvas AI Portfolios** — an
 
 - Open an issue
 - Join discussions on GitHub
-- DM us on Twitter [@YourHandle]
 
 ---
 
