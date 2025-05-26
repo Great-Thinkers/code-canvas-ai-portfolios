@@ -38,7 +38,7 @@ export default function TemplatesSection() {
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Our templates are designed to highlight your strengths as a developer,
-            from frontend designs to backend architecture.
+            from frontend designs to backend architecture. Filter by role, style, and features.
           </p>
         </div>
 
@@ -69,7 +69,7 @@ export default function TemplatesSection() {
         <div className="flex justify-center mt-12">
           <Link to="/templates">
             <Button size="lg" variant="outline">
-              View all templates
+              View all templates & filters
             </Button>
           </Link>
         </div>
