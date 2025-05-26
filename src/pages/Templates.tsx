@@ -1,10 +1,10 @@
-
 import { useState, useMemo } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import FilterSection, { FilterOptions } from '@/components/templates/FilterSection';
+import TemplatePreview from '@/components/templates/TemplatePreview';
 
 interface Template {
   id: number;
@@ -122,6 +122,9 @@ export default function Templates() {
     searchTerm: ''
   });
 
+  const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
   // Filter templates based on current filters
   const filteredTemplates = useMemo(() => {
     return templates.filter((template) => {
@@ -165,6 +168,16 @@ export default function Templates() {
       features: [],
       searchTerm: ''
     });
+  };
+
+  const handlePreview = (template: Template) => {
+    setPreviewTemplate(template);
+    setIsPreviewOpen(true);
+  };
+
+  const handleSelect = (template: Template) => {
+    console.log('Selected template:', template.name);
+    // TODO: Implement template selection logic
   };
 
   return (
@@ -223,8 +236,19 @@ export default function Templates() {
                       ))}
                     </div>
                     <div className="flex gap-2 mt-auto">
-                      <Button variant="outline" className="flex-1">Preview</Button>
-                      <Button className="flex-1">Select</Button>
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => handlePreview(template)}
+                      >
+                        Preview
+                      </Button>
+                      <Button 
+                        className="flex-1"
+                        onClick={() => handleSelect(template)}
+                      >
+                        Select
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -241,6 +265,14 @@ export default function Templates() {
         </div>
       </main>
       <Footer />
+
+      {/* Template Preview Modal */}
+      <TemplatePreview
+        template={previewTemplate}
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        onSelect={handleSelect}
+      />
     </div>
   );
 }
