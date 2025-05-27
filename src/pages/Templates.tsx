@@ -1,12 +1,14 @@
-
 import { useState, useMemo } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TemplatePreview from '@/components/templates/TemplatePreview';
 import TemplateSelectionFlow from '@/components/templates/TemplateSelectionFlow';
 import AdvancedSearch, { AdvancedFilters } from '@/components/templates/AdvancedSearch';
 import PremiumTemplateCard from '@/components/templates/PremiumTemplateCard';
+import TemplateAnalytics from '@/components/templates/TemplateAnalytics';
+import { BarChart3 } from 'lucide-react';
 
 interface Template {
   id: number;
@@ -182,6 +184,8 @@ export default function Templates() {
   const [selectionFlowTemplate, setSelectionFlowTemplate] = useState<Template | null>(null);
   const [isSelectionFlowOpen, setIsSelectionFlowOpen] = useState(false);
   const [isSubscribed] = useState(false); // TODO: Get from auth context
+  const [activeTab, setActiveTab] = useState('browse');
+  const [recommendedTemplateIds, setRecommendedTemplateIds] = useState<number[]>([]);
 
   // Filter and sort templates
   const filteredAndSortedTemplates = useMemo(() => {
@@ -246,6 +250,19 @@ export default function Templates() {
     }
   }, [templates, filters]);
 
+  const handleTemplateRecommendation = (templateIds: number[]) => {
+    setRecommendedTemplateIds(templateIds);
+    setActiveTab('browse');
+    // Optionally scroll to templates section
+    setTimeout(() => {
+      document.getElementById('templates-grid')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
+  const displayTemplates = recommendedTemplateIds.length > 0 
+    ? filteredAndSortedTemplates.filter(t => recommendedTemplateIds.includes(t.id))
+    : filteredAndSortedTemplates;
+
   const handlePreview = (template: Template) => {
     setPreviewTemplate(template);
     setIsPreviewOpen(true);
@@ -280,52 +297,100 @@ export default function Templates() {
           </div>
         </div>
 
-        {/* Search and Filters */}
+        {/* Main Content */}
         <div className="container py-12">
-          <AdvancedSearch
-            filters={filters}
-            onFiltersChange={setFilters}
-            resultCount={filteredAndSortedTemplates.length}
-            totalCount={templates.length}
-          />
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="browse">Browse Templates</TabsTrigger>
+              <TabsTrigger value="analytics" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Analytics & Insights
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Templates Grid */}
-          {filteredAndSortedTemplates.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-              {filteredAndSortedTemplates.map((template) => (
-                <PremiumTemplateCard
-                  key={template.id}
-                  template={template}
-                  onPreview={handlePreview}
-                  onSelect={handleSelect}
-                  isSubscribed={isSubscribed}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 mt-8">
-              <div className="max-w-md mx-auto">
-                <h3 className="text-lg font-semibold mb-2">No templates found</h3>
-                <p className="text-muted-foreground mb-6">
-                  Try adjusting your filters or search terms to find the perfect template for your needs.
-                </p>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setFilters({
-                    searchTerm: '',
-                    roles: [],
-                    styles: [],
-                    features: [],
-                    categories: [],
-                    isPremium: undefined,
-                    sortBy: 'popular'
-                  })}
-                >
-                  Clear All Filters
-                </Button>
+            <TabsContent value="browse" className="space-y-8">
+              {/* Search and Filters */}
+              <AdvancedSearch
+                filters={filters}
+                onFiltersChange={setFilters}
+                resultCount={displayTemplates.length}
+                totalCount={templates.length}
+              />
+
+              {/* Recommended Templates Banner */}
+              {recommendedTemplateIds.length > 0 && (
+                <div className="bg-brand-50 dark:bg-brand-950 border border-brand-200 dark:border-brand-800 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold text-brand-900 dark:text-brand-100">
+                        AI Recommended Templates
+                      </h3>
+                      <p className="text-sm text-brand-700 dark:text-brand-300">
+                        Showing {displayTemplates.length} templates based on your preferences
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setRecommendedTemplateIds([])}
+                    >
+                      Clear Recommendations
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Templates Grid */}
+              <div id="templates-grid">
+                {displayTemplates.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {displayTemplates.map((template) => (
+                      <PremiumTemplateCard
+                        key={template.id}
+                        template={template}
+                        onPreview={handlePreview}
+                        onSelect={handleSelect}
+                        isSubscribed={isSubscribed}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="max-w-md mx-auto">
+                      <h3 className="text-lg font-semibold mb-2">No templates found</h3>
+                      <p className="text-muted-foreground mb-6">
+                        Try adjusting your filters or search terms to find the perfect template for your needs.
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setFilters({
+                            searchTerm: '',
+                            roles: [],
+                            styles: [],
+                            features: [],
+                            categories: [],
+                            isPremium: undefined,
+                            sortBy: 'popular'
+                          });
+                          setRecommendedTemplateIds([]);
+                        }}
+                      >
+                        Clear All Filters
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            </TabsContent>
+
+            <TabsContent value="analytics">
+              <TemplateAnalytics 
+                templates={templates}
+                onTemplateRecommendation={handleTemplateRecommendation}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
       <Footer />
