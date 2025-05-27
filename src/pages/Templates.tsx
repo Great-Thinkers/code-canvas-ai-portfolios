@@ -1,10 +1,12 @@
+
 import { useState, useMemo } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import FilterSection, { FilterOptions } from '@/components/templates/FilterSection';
 import TemplatePreview from '@/components/templates/TemplatePreview';
+import TemplateSelectionFlow from '@/components/templates/TemplateSelectionFlow';
+import AdvancedSearch, { AdvancedFilters } from '@/components/templates/AdvancedSearch';
+import PremiumTemplateCard from '@/components/templates/PremiumTemplateCard';
 
 interface Template {
   id: number;
@@ -17,10 +19,23 @@ interface Template {
   tags: string[];
   previewUrl: string;
   isPremium?: boolean;
+  isPopular?: boolean;
+  rating?: number;
+}
+
+interface UserData {
+  name: string;
+  email: string;
+  github: string;
+  linkedin: string;
+  title: string;
+  bio: string;
+  skills: string[];
+  projects: number;
 }
 
 export default function Templates() {
-  // Enhanced template data with filtering attributes
+  // Enhanced template data with more variety and premium options
   const templates: Template[] = [
     {
       id: 1,
@@ -31,18 +46,22 @@ export default function Templates() {
       style: ['minimal', 'modern'],
       features: ['responsive', 'seo', 'projects'],
       tags: ['Minimalist', 'Professional'],
-      previewUrl: '/placeholder.svg'
+      previewUrl: '/placeholder.svg',
+      isPopular: true,
+      rating: 4.8
     },
     {
       id: 2,
-      name: 'Tech Stack',
-      description: 'Showcase your technical skills with animated code snippets and tech logos. Ideal for highlighting your programming expertise.',
+      name: 'Tech Stack Pro',
+      description: 'Showcase your technical skills with animated code snippets and tech logos. Includes advanced project filtering and GitHub integration.',
       category: 'Developer',
       role: 'fullstack',
       style: ['modern', 'dark'],
-      features: ['animations', 'projects', 'responsive'],
+      features: ['animations', 'projects', 'responsive', 'analytics'],
       tags: ['Technical', 'Interactive'],
-      previewUrl: '/placeholder.svg'
+      previewUrl: '/placeholder.svg',
+      isPremium: true,
+      rating: 4.9
     },
     {
       id: 3,
@@ -53,18 +72,22 @@ export default function Templates() {
       style: ['creative', 'colorful'],
       features: ['animations', 'projects', 'responsive'],
       tags: ['Creative', 'Visual'],
-      previewUrl: '/placeholder.svg'
+      previewUrl: '/placeholder.svg',
+      rating: 4.6
     },
     {
       id: 4,
-      name: 'Project Showcase',
-      description: 'Highlight your projects with detailed case studies and results. Perfect for demonstrating your problem-solving skills.',
+      name: 'Project Showcase Elite',
+      description: 'Highlight your projects with detailed case studies and results. Features advanced project analytics and testimonial integration.',
       category: 'Portfolio',
       role: 'fullstack',
       style: ['professional', 'modern'],
-      features: ['projects', 'seo', 'contact'],
+      features: ['projects', 'seo', 'contact', 'testimonials', 'analytics'],
       tags: ['Projects', 'Case Studies'],
-      previewUrl: '/placeholder.svg'
+      previewUrl: '/placeholder.svg',
+      isPremium: true,
+      isPopular: true,
+      rating: 4.9
     },
     {
       id: 5,
@@ -76,19 +99,20 @@ export default function Templates() {
       features: ['projects', 'blog', 'seo'],
       tags: ['Technical', 'Documentation'],
       previewUrl: '/placeholder.svg',
-      isPremium: true
+      rating: 4.5
     },
     {
       id: 6,
-      name: 'Mobile First',
-      description: 'Responsive design optimized for mobile developers showcasing app development skills.',
+      name: 'Mobile First Pro',
+      description: 'Premium responsive design optimized for mobile developers showcasing app development skills with app store integration.',
       category: 'Mobile',
       role: 'mobile',
       style: ['modern', 'responsive'],
-      features: ['responsive', 'animations', 'projects'],
+      features: ['responsive', 'animations', 'projects', 'analytics'],
       tags: ['Mobile', 'Apps'],
       previewUrl: '/placeholder.svg',
-      isPremium: true
+      isPremium: true,
+      rating: 4.7
     },
     {
       id: 7,
@@ -99,76 +123,128 @@ export default function Templates() {
       style: ['dark', 'professional'],
       features: ['projects', 'contact', 'responsive'],
       tags: ['Infrastructure', 'Monitoring'],
-      previewUrl: '/placeholder.svg'
+      previewUrl: '/placeholder.svg',
+      rating: 4.4
     },
     {
       id: 8,
-      name: 'Blog & Portfolio',
-      description: 'Combined portfolio and blog platform for developers who love to share knowledge.',
+      name: 'Blog & Portfolio Pro',
+      description: 'Premium combined portfolio and blog platform with advanced SEO, analytics, and content management features.',
       category: 'Portfolio',
       role: 'frontend',
       style: ['modern', 'professional'],
-      features: ['blog', 'projects', 'seo', 'contact'],
+      features: ['blog', 'projects', 'seo', 'contact', 'analytics'],
       tags: ['Blog', 'Content'],
       previewUrl: '/placeholder.svg',
-      isPremium: true
+      isPremium: true,
+      rating: 4.8
+    },
+    {
+      id: 9,
+      name: 'Data Science Hub',
+      description: 'Specialized template for data scientists with interactive charts, research publications, and dataset showcases.',
+      category: 'Developer',
+      role: 'data',
+      style: ['modern', 'professional'],
+      features: ['projects', 'blog', 'seo', 'analytics'],
+      tags: ['Data Science', 'Research'],
+      previewUrl: '/placeholder.svg',
+      isPremium: true,
+      rating: 4.6
+    },
+    {
+      id: 10,
+      name: 'Startup Founder',
+      description: 'Professional template for startup founders and entrepreneurs showcasing ventures, team, and achievements.',
+      category: 'Business',
+      role: 'fullstack',
+      style: ['professional', 'modern'],
+      features: ['projects', 'testimonials', 'contact', 'seo'],
+      tags: ['Business', 'Leadership'],
+      previewUrl: '/placeholder.svg',
+      isPopular: true,
+      rating: 4.7
     }
   ];
 
-  const [filters, setFilters] = useState<FilterOptions>({
-    role: 'all',
-    style: [],
+  const [filters, setFilters] = useState<AdvancedFilters>({
+    searchTerm: '',
+    roles: [],
+    styles: [],
     features: [],
-    searchTerm: ''
+    categories: [],
+    isPremium: undefined,
+    sortBy: 'popular'
   });
 
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [selectionFlowTemplate, setSelectionFlowTemplate] = useState<Template | null>(null);
+  const [isSelectionFlowOpen, setIsSelectionFlowOpen] = useState(false);
+  const [isSubscribed] = useState(false); // TODO: Get from auth context
 
-  // Filter templates based on current filters
-  const filteredTemplates = useMemo(() => {
-    return templates.filter((template) => {
+  // Filter and sort templates
+  const filteredAndSortedTemplates = useMemo(() => {
+    let filtered = templates.filter((template) => {
+      // Search filter
+      if (filters.searchTerm) {
+        const searchLower = filters.searchTerm.toLowerCase();
+        const matchesSearch = (
+          template.name.toLowerCase().includes(searchLower) ||
+          template.description.toLowerCase().includes(searchLower) ||
+          template.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
+          template.role.toLowerCase().includes(searchLower) ||
+          template.category.toLowerCase().includes(searchLower)
+        );
+        if (!matchesSearch) return false;
+      }
+
       // Role filter
-      if (filters.role !== 'all' && template.role !== filters.role) {
+      if (filters.roles.length > 0 && !filters.roles.includes(template.role)) {
         return false;
       }
 
-      // Style filter (any of the selected styles)
-      if (filters.style.length > 0 && !filters.style.some(style => template.style.includes(style))) {
+      // Style filter
+      if (filters.styles.length > 0 && !filters.styles.some(style => template.style.includes(style))) {
         return false;
       }
 
-      // Features filter (any of the selected features)
+      // Features filter
       if (filters.features.length > 0 && !filters.features.some(feature => template.features.includes(feature))) {
         return false;
       }
 
-      // Search filter
-      if (filters.searchTerm) {
-        const searchLower = filters.searchTerm.toLowerCase();
-        return (
-          template.name.toLowerCase().includes(searchLower) ||
-          template.description.toLowerCase().includes(searchLower) ||
-          template.tags.some(tag => tag.toLowerCase().includes(searchLower))
-        );
+      // Category filter
+      if (filters.categories.length > 0 && !filters.categories.includes(template.category)) {
+        return false;
+      }
+
+      // Premium filter
+      if (filters.isPremium === true && !template.isPremium) {
+        return false;
       }
 
       return true;
     });
+
+    // Sort templates
+    switch (filters.sortBy) {
+      case 'popular':
+        return filtered.sort((a, b) => {
+          if (a.isPopular && !b.isPopular) return -1;
+          if (!a.isPopular && b.isPopular) return 1;
+          return (b.rating || 0) - (a.rating || 0);
+        });
+      case 'newest':
+        return filtered.sort((a, b) => b.id - a.id);
+      case 'name':
+        return filtered.sort((a, b) => a.name.localeCompare(b.name));
+      case 'category':
+        return filtered.sort((a, b) => a.category.localeCompare(b.category));
+      default:
+        return filtered;
+    }
   }, [templates, filters]);
-
-  const handleFiltersChange = (newFilters: FilterOptions) => {
-    setFilters(newFilters);
-  };
-
-  const handleClearFilters = () => {
-    setFilters({
-      role: 'all',
-      style: [],
-      features: [],
-      searchTerm: ''
-    });
-  };
 
   const handlePreview = (template: Template) => {
     setPreviewTemplate(template);
@@ -176,8 +252,17 @@ export default function Templates() {
   };
 
   const handleSelect = (template: Template) => {
-    console.log('Selected template:', template.name);
-    // TODO: Implement template selection logic
+    setSelectionFlowTemplate(template);
+    setIsSelectionFlowOpen(true);
+  };
+
+  const handleSelectionComplete = (template: Template, userData: UserData) => {
+    console.log('Creating portfolio with:', { template: template.name, userData });
+    // TODO: Implement portfolio creation logic
+    // This would typically involve:
+    // 1. Saving the user data
+    // 2. Creating a new portfolio instance
+    // 3. Redirecting to the portfolio editor or dashboard
   };
 
   return (
@@ -189,77 +274,56 @@ export default function Templates() {
           <div className="container py-12 text-center">
             <h1 className="text-3xl font-display font-bold mb-4">Portfolio Templates</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Choose from a variety of professional templates to showcase your skills, projects, and experience. All templates are fully customizable to match your personal brand.
+              Choose from a variety of professional templates to showcase your skills, projects, and experience. 
+              All templates are fully customizable to match your personal brand.
             </p>
           </div>
         </div>
 
-        {/* Filters and Templates */}
+        {/* Search and Filters */}
         <div className="container py-12">
-          <FilterSection
+          <AdvancedSearch
             filters={filters}
-            onFiltersChange={handleFiltersChange}
-            onClearFilters={handleClearFilters}
+            onFiltersChange={setFilters}
+            resultCount={filteredAndSortedTemplates.length}
+            totalCount={templates.length}
           />
 
-          {/* Results Count */}
-          <div className="mb-6">
-            <p className="text-muted-foreground">
-              Showing {filteredTemplates.length} of {templates.length} templates
-            </p>
-          </div>
-
           {/* Templates Grid */}
-          {filteredTemplates.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredTemplates.map((template) => (
-                <div key={template.id} className="group border rounded-lg overflow-hidden flex flex-col transition-all hover:shadow-md">
-                  <div className="aspect-video bg-muted relative overflow-hidden">
-                    <img 
-                      src={template.previewUrl} 
-                      alt={template.name} 
-                      className="w-full h-full object-cover transition-transform group-hover:scale-105" 
-                    />
-                    <div className="absolute top-2 right-2 flex gap-2">
-                      <Badge variant="secondary">{template.category}</Badge>
-                      {template.isPremium && (
-                        <Badge className="bg-brand-500 text-white hover:bg-brand-600">Premium</Badge>
-                      )}
-                    </div>
-                  </div>
-                  <div className="p-4 flex-1 flex flex-col">
-                    <h3 className="font-display font-semibold mb-2">{template.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-4 flex-1">{template.description}</p>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {template.tags.map((tag) => (
-                        <Badge key={tag} variant="outline">{tag}</Badge>
-                      ))}
-                    </div>
-                    <div className="flex gap-2 mt-auto">
-                      <Button 
-                        variant="outline" 
-                        className="flex-1"
-                        onClick={() => handlePreview(template)}
-                      >
-                        Preview
-                      </Button>
-                      <Button 
-                        className="flex-1"
-                        onClick={() => handleSelect(template)}
-                      >
-                        Select
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+          {filteredAndSortedTemplates.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+              {filteredAndSortedTemplates.map((template) => (
+                <PremiumTemplateCard
+                  key={template.id}
+                  template={template}
+                  onPreview={handlePreview}
+                  onSelect={handleSelect}
+                  isSubscribed={isSubscribed}
+                />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground mb-4">No templates match your current filters.</p>
-              <Button variant="outline" onClick={handleClearFilters}>
-                Clear Filters
-              </Button>
+            <div className="text-center py-12 mt-8">
+              <div className="max-w-md mx-auto">
+                <h3 className="text-lg font-semibold mb-2">No templates found</h3>
+                <p className="text-muted-foreground mb-6">
+                  Try adjusting your filters or search terms to find the perfect template for your needs.
+                </p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setFilters({
+                    searchTerm: '',
+                    roles: [],
+                    styles: [],
+                    features: [],
+                    categories: [],
+                    isPremium: undefined,
+                    sortBy: 'popular'
+                  })}
+                >
+                  Clear All Filters
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -272,6 +336,14 @@ export default function Templates() {
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         onSelect={handleSelect}
+      />
+
+      {/* Template Selection Flow */}
+      <TemplateSelectionFlow
+        template={selectionFlowTemplate}
+        isOpen={isSelectionFlowOpen}
+        onClose={() => setIsSelectionFlowOpen(false)}
+        onComplete={handleSelectionComplete}
       />
     </div>
   );
