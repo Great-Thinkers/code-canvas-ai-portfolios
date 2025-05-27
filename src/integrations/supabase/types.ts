@@ -9,6 +9,306 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      github_profiles: {
+        Row: {
+          access_token: string | null
+          avatar_url: string | null
+          bio: string | null
+          blog: string | null
+          company: string | null
+          created_at: string
+          display_name: string | null
+          followers: number | null
+          following: number | null
+          github_user_id: string
+          id: string
+          last_synced_at: string | null
+          location: string | null
+          public_repos: number | null
+          refresh_token: string | null
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          access_token?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          blog?: string | null
+          company?: string | null
+          created_at?: string
+          display_name?: string | null
+          followers?: number | null
+          following?: number | null
+          github_user_id: string
+          id?: string
+          last_synced_at?: string | null
+          location?: string | null
+          public_repos?: number | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          access_token?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          blog?: string | null
+          company?: string | null
+          created_at?: string
+          display_name?: string | null
+          followers?: number | null
+          following?: number | null
+          github_user_id?: string
+          id?: string
+          last_synced_at?: string | null
+          location?: string | null
+          public_repos?: number | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      github_repositories: {
+        Row: {
+          created_at: string
+          created_at_github: string | null
+          description: string | null
+          forks_count: number | null
+          full_name: string
+          github_profile_id: string
+          html_url: string
+          id: string
+          is_fork: boolean | null
+          is_private: boolean | null
+          language: string | null
+          languages_data: Json | null
+          name: string
+          pushed_at_github: string | null
+          repo_id: number
+          stargazers_count: number | null
+          topics: string[] | null
+          updated_at: string
+          updated_at_github: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_at_github?: string | null
+          description?: string | null
+          forks_count?: number | null
+          full_name: string
+          github_profile_id: string
+          html_url: string
+          id?: string
+          is_fork?: boolean | null
+          is_private?: boolean | null
+          language?: string | null
+          languages_data?: Json | null
+          name: string
+          pushed_at_github?: string | null
+          repo_id: number
+          stargazers_count?: number | null
+          topics?: string[] | null
+          updated_at?: string
+          updated_at_github?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_at_github?: string | null
+          description?: string | null
+          forks_count?: number | null
+          full_name?: string
+          github_profile_id?: string
+          html_url?: string
+          id?: string
+          is_fork?: boolean | null
+          is_private?: boolean | null
+          language?: string | null
+          languages_data?: Json | null
+          name?: string
+          pushed_at_github?: string | null
+          repo_id?: number
+          stargazers_count?: number | null
+          topics?: string[] | null
+          updated_at?: string
+          updated_at_github?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "github_repositories_github_profile_id_fkey"
+            columns: ["github_profile_id"]
+            isOneToOne: false
+            referencedRelation: "github_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      linkedin_education: {
+        Row: {
+          created_at: string
+          degree: string | null
+          description: string | null
+          end_date: string | null
+          field_of_study: string | null
+          id: string
+          institution_name: string
+          linkedin_profile_id: string
+          start_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          degree?: string | null
+          description?: string | null
+          end_date?: string | null
+          field_of_study?: string | null
+          id?: string
+          institution_name: string
+          linkedin_profile_id: string
+          start_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          degree?: string | null
+          description?: string | null
+          end_date?: string | null
+          field_of_study?: string | null
+          id?: string
+          institution_name?: string
+          linkedin_profile_id?: string
+          start_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "linkedin_education_linkedin_profile_id_fkey"
+            columns: ["linkedin_profile_id"]
+            isOneToOne: false
+            referencedRelation: "linkedin_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      linkedin_experiences: {
+        Row: {
+          company_logo_url: string | null
+          company_name: string
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          is_current: boolean | null
+          linkedin_profile_id: string
+          location: string | null
+          start_date: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          company_logo_url?: string | null
+          company_name: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          linkedin_profile_id: string
+          location?: string | null
+          start_date?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          company_logo_url?: string | null
+          company_name?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          linkedin_profile_id?: string
+          location?: string | null
+          start_date?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "linkedin_experiences_linkedin_profile_id_fkey"
+            columns: ["linkedin_profile_id"]
+            isOneToOne: false
+            referencedRelation: "linkedin_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      linkedin_profiles: {
+        Row: {
+          access_token: string | null
+          connections_count: number | null
+          created_at: string
+          first_name: string | null
+          headline: string | null
+          id: string
+          industry: string | null
+          last_name: string | null
+          last_synced_at: string | null
+          linkedin_user_id: string
+          location: string | null
+          profile_picture_url: string | null
+          refresh_token: string | null
+          summary: string | null
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          connections_count?: number | null
+          created_at?: string
+          first_name?: string | null
+          headline?: string | null
+          id?: string
+          industry?: string | null
+          last_name?: string | null
+          last_synced_at?: string | null
+          linkedin_user_id: string
+          location?: string | null
+          profile_picture_url?: string | null
+          refresh_token?: string | null
+          summary?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          connections_count?: number | null
+          created_at?: string
+          first_name?: string | null
+          headline?: string | null
+          id?: string
+          industry?: string | null
+          last_name?: string | null
+          last_synced_at?: string | null
+          linkedin_user_id?: string
+          location?: string | null
+          profile_picture_url?: string | null
+          refresh_token?: string | null
+          summary?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

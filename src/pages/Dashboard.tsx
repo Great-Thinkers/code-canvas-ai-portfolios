@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
@@ -10,6 +9,8 @@ import Footer from '@/components/layout/Footer';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useGitHubIntegration } from '@/hooks/useGitHubIntegration';
+import { useLinkedInIntegration } from '@/hooks/useLinkedInIntegration';
 
 // Sample data - in a real app this would come from your backend
 const samplePortfolios = [
@@ -34,9 +35,25 @@ const samplePortfolios = [
 function DashboardContent() {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [githubConnected, setGithubConnected] = useState(false);
-  const [linkedinConnected, setLinkedinConnected] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
+  
+  const {
+    isConnected: githubConnected,
+    profile: githubProfile,
+    connectGitHub,
+    disconnectGitHub,
+    syncData: syncGitHub,
+    loading: githubLoading
+  } = useGitHubIntegration();
+
+  const {
+    isConnected: linkedinConnected,
+    profile: linkedinProfile,
+    connectLinkedIn,
+    disconnectLinkedIn,
+    syncData: syncLinkedIn,
+    loading: linkedinLoading
+  } = useLinkedInIntegration();
 
   useEffect(() => {
     if (user) {
@@ -60,38 +77,68 @@ function DashboardContent() {
     }
   };
 
-  const handleConnectGithub = () => {
-    // This would trigger the OAuth flow in a real app
-    setGithubConnected(true);
-    toast({
-      title: "GitHub connected",
-      description: "Your GitHub account has been successfully linked.",
-    });
+  const handleConnectGithub = async () => {
+    try {
+      await connectGitHub();
+      toast({
+        title: "GitHub OAuth initiated",
+        description: "You'll be redirected to GitHub to authorize the connection.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "GitHub connection failed",
+        description: "There was an error initiating the GitHub OAuth flow.",
+      });
+    }
   };
 
-  const handleDisconnectGithub = () => {
-    setGithubConnected(false);
-    toast({
-      title: "GitHub disconnected",
-      description: "Your GitHub account has been unlinked.",
-    });
+  const handleDisconnectGithub = async () => {
+    try {
+      await disconnectGitHub();
+      toast({
+        title: "GitHub disconnected",
+        description: "Your GitHub account has been unlinked.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Disconnection failed",
+        description: "There was an error disconnecting your GitHub account.",
+      });
+    }
   };
 
-  const handleConnectLinkedin = () => {
-    // This would trigger the OAuth flow in a real app
-    setLinkedinConnected(true);
-    toast({
-      title: "LinkedIn connected",
-      description: "Your LinkedIn account has been successfully linked.",
-    });
+  const handleConnectLinkedin = async () => {
+    try {
+      await connectLinkedIn();
+      toast({
+        title: "LinkedIn OAuth initiated",
+        description: "You'll be redirected to LinkedIn to authorize the connection.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "LinkedIn connection failed",
+        description: "There was an error initiating the LinkedIn OAuth flow.",
+      });
+    }
   };
 
-  const handleDisconnectLinkedin = () => {
-    setLinkedinConnected(false);
-    toast({
-      title: "LinkedIn disconnected",
-      description: "Your LinkedIn account has been unlinked.",
-    });
+  const handleDisconnectLinkedin = async () => {
+    try {
+      await disconnectLinkedIn();
+      toast({
+        title: "LinkedIn disconnected",
+        description: "Your LinkedIn account has been unlinked.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Disconnection failed",
+        description: "There was an error disconnecting your LinkedIn account.",
+      });
+    }
   };
 
   return (
@@ -138,6 +185,9 @@ function DashboardContent() {
                 isConnected={githubConnected}
                 onConnect={handleConnectGithub}
                 onDisconnect={handleDisconnectGithub}
+                loading={githubLoading}
+                lastSynced={githubProfile?.last_synced_at}
+                profileData={githubProfile}
               />
               
               <IntegrationCard 
@@ -153,6 +203,9 @@ function DashboardContent() {
                 isConnected={linkedinConnected}
                 onConnect={handleConnectLinkedin}
                 onDisconnect={handleDisconnectLinkedin}
+                loading={linkedinLoading}
+                lastSynced={linkedinProfile?.last_synced_at}
+                profileData={linkedinProfile}
               />
             </div>
           </TabsContent>
