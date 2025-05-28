@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Mail, Github, Linkedin, Code, Palette } from "lucide-react";
+import { User, Mail, Github, Linkedin, Code, Palette, RefreshCw, Zap } from "lucide-react";
+import { useGitHubData } from "@/hooks/useGitHubData";
+import { useLinkedInData } from "@/hooks/useLinkedInData";
+import { toast } from "sonner";
 
 interface Template {
   id: number;
@@ -41,6 +44,9 @@ export default function TemplateCustomization({
   onNext,
   onBack,
 }: TemplateCustomizationProps) {
+  const { gitHubData, languages, loading: githubLoading } = useGitHubData();
+  const { linkedInData, experiences, loading: linkedinLoading } = useLinkedInData();
+  
   const [userData, setUserData] = useState<UserData>({
     name: "John Doe",
     email: "john@example.com",
@@ -53,6 +59,39 @@ export default function TemplateCustomization({
   });
 
   const [newSkill, setNewSkill] = useState("");
+
+  // Auto-populate data when GitHub/LinkedIn data is available
+  useEffect(() => {
+    if (gitHubData || linkedInData) {
+      const updatedData: Partial<UserData> = {};
+
+      if (gitHubData) {
+        updatedData.name = gitHubData.name || userData.name;
+        updatedData.email = gitHubData.email || userData.email;
+        updatedData.github = gitHubData.login || userData.github;
+        updatedData.bio = gitHubData.bio || userData.bio;
+        updatedData.projects = gitHubData.public_repos || userData.projects;
+        
+        // Use programming languages from repositories as skills
+        if (languages.length > 0) {
+          updatedData.skills = [...new Set([...languages, ...userData.skills])];
+        }
+      }
+
+      if (linkedInData) {
+        updatedData.name = `${linkedInData.firstName} ${linkedInData.lastName}`.trim() || updatedData.name;
+        updatedData.linkedin = updatedData.name?.toLowerCase().replace(/\s+/g, '') || userData.linkedin;
+        updatedData.title = linkedInData.headline || updatedData.title;
+        updatedData.bio = linkedInData.summary || updatedData.bio;
+      }
+
+      setUserData(prev => ({ ...prev, ...updatedData }));
+      
+      if (gitHubData || linkedInData) {
+        toast.success("Data auto-populated from your connected accounts!");
+      }
+    }
+  }, [gitHubData, linkedInData, languages]);
 
   const handleInputChange = (field: keyof UserData, value: string) => {
     setUserData((prev) => ({ ...prev, [field]: value }));
@@ -79,6 +118,17 @@ export default function TemplateCustomization({
     onNext(userData);
   };
 
+  const addLanguagesAsSkills = () => {
+    if (languages.length > 0) {
+      const newSkills = languages.filter(lang => !userData.skills.includes(lang));
+      setUserData((prev) => ({
+        ...prev,
+        skills: [...prev.skills, ...newSkills],
+      }));
+      toast.success(`Added ${newSkills.length} programming languages as skills!`);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -91,9 +141,17 @@ export default function TemplateCustomization({
             information
           </p>
         </div>
-        <Badge variant="outline" className="capitalize">
-          {template.category}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="capitalize">
+            {template.category}
+          </Badge>
+          {(gitHubData || linkedInData) && (
+            <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+              <Zap className="h-3 w-3 mr-1" />
+              Auto-populated
+            </Badge>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -104,6 +162,9 @@ export default function TemplateCustomization({
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
                 Personal Information
+                {(githubLoading || linkedinLoading) && (
+                  <RefreshCw className="h-4 w-4 animate-spin ml-auto" />
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -176,7 +237,20 @@ export default function TemplateCustomization({
                 </div>
               </div>
               <div>
-                <Label>Skills</Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label>Skills</Label>
+                  {languages.length > 0 && (
+                    <Button
+                      onClick={addLanguagesAsSkills}
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                    >
+                      <Github className="h-3 w-3 mr-1" />
+                      Add Languages ({languages.length})
+                    </Button>
+                  )}
+                </div>
                 <div className="flex gap-2 mb-2">
                   <Input
                     placeholder="Add a skill..."
