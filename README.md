@@ -83,7 +83,7 @@ Or use:
 - [Netlify](https://netlify.com)
 - GitHub Pages
 
-### 🚀 Deploy to github pages
+### 🚀 Deploy to GitHub pages
 ---
 
 ## 🧑‍💻 Contributing
