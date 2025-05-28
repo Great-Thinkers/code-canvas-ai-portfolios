@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
@@ -34,7 +35,7 @@ export default function DashboardHeader() {
             className="w-full md:w-[200px] pl-9"
           />
         </div>
-        <Link to="/dashboard/new">
+        <Link to="/dashboard/create">
           <Button>
             <svg
               xmlns="http://www.w3.org/2000/svg"
