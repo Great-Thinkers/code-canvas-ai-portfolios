@@ -123,9 +123,30 @@ function CreatePortfolioContent() {
     setIsCreating(true);
     
     try {
+      // Convert the data to a JSON-serializable format
       const portfolioData = {
-        template: template,
-        userData: userData,
+        template: {
+          id: template.id,
+          name: template.name,
+          description: template.description,
+          category: template.category,
+          role: template.role,
+          style: template.style,
+          features: template.features,
+          tags: template.tags,
+          previewUrl: template.previewUrl,
+          isPremium: template.isPremium || false,
+        },
+        userData: {
+          name: userData.name,
+          email: userData.email,
+          github: userData.github,
+          linkedin: userData.linkedin,
+          title: userData.title,
+          bio: userData.bio,
+          skills: userData.skills,
+          projects: userData.projects,
+        },
         createdAt: new Date().toISOString(),
       };
 
