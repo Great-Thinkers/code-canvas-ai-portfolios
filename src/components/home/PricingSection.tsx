@@ -1,8 +1,14 @@
-
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check } from 'lucide-react';
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Check } from "lucide-react";
 
 export default function PricingSection() {
   return (
@@ -12,8 +18,8 @@ export default function PricingSection() {
           Simple, transparent pricing
         </h2>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Get started for free and upgrade when you need more power.
-          No hidden fees or complicated tiers.
+          Get started for free and upgrade when you need more power. No hidden
+          fees or complicated tiers.
         </p>
       </div>
 
@@ -30,7 +36,13 @@ export default function PricingSection() {
           </CardHeader>
           <CardContent className="flex-1">
             <ul className="space-y-3">
-              {["2 portfolio projects", "GitHub integration", "Basic templates", "Manual updates", "Export as HTML/CSS"].map((feature, i) => (
+              {[
+                "2 portfolio projects",
+                "GitHub integration",
+                "Basic templates",
+                "Manual updates",
+                "Export as HTML/CSS",
+              ].map((feature, i) => (
                 <li key={i} className="flex items-center">
                   <Check className="mr-2 h-4 w-4 text-brand-500" />
                   <span className="text-sm">{feature}</span>
@@ -82,9 +94,7 @@ export default function PricingSection() {
           </CardContent>
           <CardFooter>
             <Link to="/signup" className="w-full">
-              <Button className="w-full">
-                Get started
-              </Button>
+              <Button className="w-full">Get started</Button>
             </Link>
           </CardFooter>
         </Card>

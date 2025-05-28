@@ -1,6 +1,5 @@
-
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export default function CTASection() {
   return (
@@ -11,8 +10,8 @@ export default function CTASection() {
             Ready to showcase your developer journey?
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Join thousands of developers who use CodeCanvas to create professional portfolios that
-            get noticed by recruiters and clients.
+            Join thousands of developers who use CodeCanvas to create
+            professional portfolios that get noticed by recruiters and clients.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
             <Link to="/signup">

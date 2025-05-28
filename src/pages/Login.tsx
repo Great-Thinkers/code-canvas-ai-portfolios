@@ -1,10 +1,9 @@
-
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { LoginForm } from '@/components/auth/LoginForm';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
-import { useAuth } from '@/contexts/AuthContext';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { LoginForm } from "@/components/auth/LoginForm";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
   const { user, loading } = useAuth();
@@ -12,7 +11,7 @@ export default function Login() {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   }, [user, loading, navigate]);
 

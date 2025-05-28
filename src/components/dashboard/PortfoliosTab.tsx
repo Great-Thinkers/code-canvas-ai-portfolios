@@ -1,24 +1,23 @@
-
-import { Link } from 'react-router-dom';
-import PortfolioCard from '@/components/dashboard/PortfolioCard';
+import { Link } from "react-router-dom";
+import PortfolioCard from "@/components/dashboard/PortfolioCard";
 
 // Sample data - in a real app this would come from your backend
 const samplePortfolios = [
   {
-    id: '1',
-    name: 'My Professional Portfolio',
-    template: 'Modern Minimal',
-    lastUpdated: '2 days ago',
+    id: "1",
+    name: "My Professional Portfolio",
+    template: "Modern Minimal",
+    lastUpdated: "2 days ago",
     isPublished: true,
-    previewUrl: '/placeholder.svg',
+    previewUrl: "/placeholder.svg",
   },
   {
-    id: '2',
-    name: 'Side Project Showcase',
-    template: 'Tech Stack',
-    lastUpdated: '1 week ago',
+    id: "2",
+    name: "Side Project Showcase",
+    template: "Tech Stack",
+    lastUpdated: "1 week ago",
     isPublished: false,
-    previewUrl: '/placeholder.svg',
+    previewUrl: "/placeholder.svg",
   },
 ];
 

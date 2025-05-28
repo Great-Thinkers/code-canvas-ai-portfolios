@@ -1,7 +1,6 @@
-
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface LinkedInProfile {
   id: string;
@@ -37,13 +36,13 @@ export const useLinkedInIntegration = () => {
 
     try {
       const { data, error } = await supabase
-        .from('linkedin_profiles')
-        .select('*')
-        .eq('user_id', user.id)
+        .from("linkedin_profiles")
+        .select("*")
+        .eq("user_id", user.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error checking LinkedIn connection:', error);
+      if (error && error.code !== "PGRST116") {
+        console.error("Error checking LinkedIn connection:", error);
         return;
       }
 
@@ -52,7 +51,7 @@ export const useLinkedInIntegration = () => {
         setIsConnected(true);
       }
     } catch (error) {
-      console.error('Error checking LinkedIn connection:', error);
+      console.error("Error checking LinkedIn connection:", error);
     }
   };
 
@@ -61,18 +60,18 @@ export const useLinkedInIntegration = () => {
     try {
       // Initiate LinkedIn OAuth flow
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'linkedin_oidc',
+        provider: "linkedin_oidc",
         options: {
           redirectTo: `${window.location.origin}/dashboard`,
-          scopes: 'openid profile email'
-        }
+          scopes: "openid profile email",
+        },
       });
 
       if (error) {
         throw error;
       }
     } catch (error) {
-      console.error('Error connecting to LinkedIn:', error);
+      console.error("Error connecting to LinkedIn:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -85,9 +84,9 @@ export const useLinkedInIntegration = () => {
     setLoading(true);
     try {
       const { error } = await supabase
-        .from('linkedin_profiles')
+        .from("linkedin_profiles")
         .delete()
-        .eq('user_id', user.id);
+        .eq("user_id", user.id);
 
       if (error) {
         throw error;
@@ -96,7 +95,7 @@ export const useLinkedInIntegration = () => {
       setProfile(null);
       setIsConnected(false);
     } catch (error) {
-      console.error('Error disconnecting LinkedIn:', error);
+      console.error("Error disconnecting LinkedIn:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -109,9 +108,12 @@ export const useLinkedInIntegration = () => {
     setLoading(true);
     try {
       // Call edge function to sync LinkedIn data
-      const { data, error } = await supabase.functions.invoke('sync-linkedin-data', {
-        body: { user_id: user.id }
-      });
+      const { data, error } = await supabase.functions.invoke(
+        "sync-linkedin-data",
+        {
+          body: { user_id: user.id },
+        },
+      );
 
       if (error) {
         throw error;
@@ -120,7 +122,7 @@ export const useLinkedInIntegration = () => {
       // Refresh profile data
       await checkConnection();
     } catch (error) {
-      console.error('Error syncing LinkedIn data:', error);
+      console.error("Error syncing LinkedIn data:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -134,6 +136,6 @@ export const useLinkedInIntegration = () => {
     connectLinkedIn,
     disconnectLinkedIn,
     syncData,
-    checkConnection
+    checkConnection,
   };
 };

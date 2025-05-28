@@ -1,9 +1,14 @@
-
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Search } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Search } from "lucide-react";
 
 export interface FilterOptions {
   role: string;
@@ -19,48 +24,52 @@ interface FilterSectionProps {
 }
 
 const roles = [
-  { value: 'all', label: 'All Roles' },
-  { value: 'frontend', label: 'Frontend Developer' },
-  { value: 'backend', label: 'Backend Engineer' },
-  { value: 'fullstack', label: 'Full-stack Developer' },
-  { value: 'designer', label: 'UI/UX Designer' },
-  { value: 'mobile', label: 'Mobile Developer' },
-  { value: 'devops', label: 'DevOps Engineer' },
+  { value: "all", label: "All Roles" },
+  { value: "frontend", label: "Frontend Developer" },
+  { value: "backend", label: "Backend Engineer" },
+  { value: "fullstack", label: "Full-stack Developer" },
+  { value: "designer", label: "UI/UX Designer" },
+  { value: "mobile", label: "Mobile Developer" },
+  { value: "devops", label: "DevOps Engineer" },
 ];
 
 const styles = [
-  { id: 'minimal', label: 'Minimalist' },
-  { id: 'modern', label: 'Modern' },
-  { id: 'creative', label: 'Creative' },
-  { id: 'professional', label: 'Professional' },
-  { id: 'dark', label: 'Dark Mode' },
-  { id: 'colorful', label: 'Colorful' },
+  { id: "minimal", label: "Minimalist" },
+  { id: "modern", label: "Modern" },
+  { id: "creative", label: "Creative" },
+  { id: "professional", label: "Professional" },
+  { id: "dark", label: "Dark Mode" },
+  { id: "colorful", label: "Colorful" },
 ];
 
 const features = [
-  { id: 'projects', label: 'Project Showcase' },
-  { id: 'blog', label: 'Blog Integration' },
-  { id: 'animations', label: 'Animations' },
-  { id: 'responsive', label: 'Mobile Responsive' },
-  { id: 'seo', label: 'SEO Optimized' },
-  { id: 'contact', label: 'Contact Form' },
+  { id: "projects", label: "Project Showcase" },
+  { id: "blog", label: "Blog Integration" },
+  { id: "animations", label: "Animations" },
+  { id: "responsive", label: "Mobile Responsive" },
+  { id: "seo", label: "SEO Optimized" },
+  { id: "contact", label: "Contact Form" },
 ];
 
-export default function FilterSection({ filters, onFiltersChange, onClearFilters }: FilterSectionProps) {
+export default function FilterSection({
+  filters,
+  onFiltersChange,
+  onClearFilters,
+}: FilterSectionProps) {
   const handleRoleChange = (role: string) => {
     onFiltersChange({ ...filters, role });
   };
 
   const handleStyleToggle = (styleId: string) => {
     const newStyles = filters.style.includes(styleId)
-      ? filters.style.filter(s => s !== styleId)
+      ? filters.style.filter((s) => s !== styleId)
       : [...filters.style, styleId];
     onFiltersChange({ ...filters, style: newStyles });
   };
 
   const handleFeatureToggle = (featureId: string) => {
     const newFeatures = filters.features.includes(featureId)
-      ? filters.features.filter(f => f !== featureId)
+      ? filters.features.filter((f) => f !== featureId)
       : [...filters.features, featureId];
     onFiltersChange({ ...filters, features: newFeatures });
   };
@@ -69,7 +78,11 @@ export default function FilterSection({ filters, onFiltersChange, onClearFilters
     onFiltersChange({ ...filters, searchTerm });
   };
 
-  const hasActiveFilters = filters.role !== 'all' || filters.style.length > 0 || filters.features.length > 0 || filters.searchTerm !== '';
+  const hasActiveFilters =
+    filters.role !== "all" ||
+    filters.style.length > 0 ||
+    filters.features.length > 0 ||
+    filters.searchTerm !== "";
 
   return (
     <div className="bg-muted/30 border rounded-lg p-6 mb-8">
@@ -158,25 +171,23 @@ export default function FilterSection({ filters, onFiltersChange, onClearFilters
           <div className="space-y-2">
             <label className="text-sm font-medium">Active Filters</label>
             <div className="flex flex-wrap gap-2">
-              {filters.role !== 'all' && (
+              {filters.role !== "all" && (
                 <Badge variant="secondary">
-                  {roles.find(r => r.value === filters.role)?.label}
+                  {roles.find((r) => r.value === filters.role)?.label}
                 </Badge>
               )}
               {filters.style.map((styleId) => (
                 <Badge key={styleId} variant="secondary">
-                  {styles.find(s => s.id === styleId)?.label}
+                  {styles.find((s) => s.id === styleId)?.label}
                 </Badge>
               ))}
               {filters.features.map((featureId) => (
                 <Badge key={featureId} variant="secondary">
-                  {features.find(f => f.id === featureId)?.label}
+                  {features.find((f) => f.id === featureId)?.label}
                 </Badge>
               ))}
               {filters.searchTerm && (
-                <Badge variant="secondary">
-                  "{filters.searchTerm}"
-                </Badge>
+                <Badge variant="secondary">"{filters.searchTerm}"</Badge>
               )}
             </div>
           </div>

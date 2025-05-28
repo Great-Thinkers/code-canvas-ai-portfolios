@@ -1,11 +1,10 @@
-
-import { useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { CheckCircle, ArrowLeft, ArrowRight, Crown } from 'lucide-react';
-import TemplateCustomization from './TemplateCustomization';
+import { useState } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { CheckCircle, ArrowLeft, ArrowRight, Crown } from "lucide-react";
+import TemplateCustomization from "./TemplateCustomization";
 
 interface Template {
   id: number;
@@ -38,47 +37,55 @@ interface TemplateSelectionFlowProps {
   onComplete: (template: Template, userData: UserData) => void;
 }
 
-type FlowStep = 'preview' | 'customize' | 'confirm';
+type FlowStep = "preview" | "customize" | "confirm";
 
-export default function TemplateSelectionFlow({ 
-  template, 
-  isOpen, 
-  onClose, 
-  onComplete 
+export default function TemplateSelectionFlow({
+  template,
+  isOpen,
+  onClose,
+  onComplete,
 }: TemplateSelectionFlowProps) {
-  const [currentStep, setCurrentStep] = useState<FlowStep>('preview');
+  const [currentStep, setCurrentStep] = useState<FlowStep>("preview");
   const [userData, setUserData] = useState<UserData | null>(null);
 
   if (!template) return null;
 
   const steps = [
-    { id: 'preview', label: 'Preview Template', completed: currentStep !== 'preview' },
-    { id: 'customize', label: 'Customize Data', completed: currentStep === 'confirm' },
-    { id: 'confirm', label: 'Create Portfolio', completed: false }
+    {
+      id: "preview",
+      label: "Preview Template",
+      completed: currentStep !== "preview",
+    },
+    {
+      id: "customize",
+      label: "Customize Data",
+      completed: currentStep === "confirm",
+    },
+    { id: "confirm", label: "Create Portfolio", completed: false },
   ];
 
-  const currentStepIndex = steps.findIndex(step => step.id === currentStep);
+  const currentStepIndex = steps.findIndex((step) => step.id === currentStep);
   const progress = ((currentStepIndex + 1) / steps.length) * 100;
 
   const handleNext = () => {
-    if (currentStep === 'preview') {
-      setCurrentStep('customize');
-    } else if (currentStep === 'customize' && userData) {
-      setCurrentStep('confirm');
+    if (currentStep === "preview") {
+      setCurrentStep("customize");
+    } else if (currentStep === "customize" && userData) {
+      setCurrentStep("confirm");
     }
   };
 
   const handleBack = () => {
-    if (currentStep === 'customize') {
-      setCurrentStep('preview');
-    } else if (currentStep === 'confirm') {
-      setCurrentStep('customize');
+    if (currentStep === "customize") {
+      setCurrentStep("preview");
+    } else if (currentStep === "confirm") {
+      setCurrentStep("customize");
     }
   };
 
   const handleCustomizationNext = (data: UserData) => {
     setUserData(data);
-    setCurrentStep('confirm');
+    setCurrentStep("confirm");
   };
 
   const handleComplete = () => {
@@ -86,14 +93,14 @@ export default function TemplateSelectionFlow({
       onComplete(template, userData);
       onClose();
       // Reset state
-      setCurrentStep('preview');
+      setCurrentStep("preview");
       setUserData(null);
     }
   };
 
   const renderStepContent = () => {
     switch (currentStep) {
-      case 'preview':
+      case "preview":
         return (
           <div className="space-y-6">
             <div className="text-center">
@@ -101,14 +108,14 @@ export default function TemplateSelectionFlow({
                 {template.name} Template
               </h2>
               <p className="text-muted-foreground">
-                Perfect for {template.role.replace('-', ' ')} developers
+                Perfect for {template.role.replace("-", " ")} developers
               </p>
             </div>
 
             <div className="aspect-video bg-muted rounded-lg overflow-hidden border">
-              <img 
-                src={template.previewUrl} 
-                alt={template.name} 
+              <img
+                src={template.previewUrl}
+                alt={template.name}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -119,7 +126,7 @@ export default function TemplateSelectionFlow({
                 <div className="flex flex-wrap gap-2">
                   {template.style.map((style) => (
                     <Badge key={style} variant="outline" className="capitalize">
-                      {style.replace('-', ' ')}
+                      {style.replace("-", " ")}
                     </Badge>
                   ))}
                 </div>
@@ -128,8 +135,12 @@ export default function TemplateSelectionFlow({
                 <h4 className="font-semibold mb-2">Features</h4>
                 <div className="flex flex-wrap gap-2">
                   {template.features.slice(0, 3).map((feature) => (
-                    <Badge key={feature} variant="outline" className="capitalize">
-                      {feature.replace('-', ' ')}
+                    <Badge
+                      key={feature}
+                      variant="outline"
+                      className="capitalize"
+                    >
+                      {feature.replace("-", " ")}
                     </Badge>
                   ))}
                   {template.features.length > 3 && (
@@ -161,7 +172,7 @@ export default function TemplateSelectionFlow({
           </div>
         );
 
-      case 'customize':
+      case "customize":
         return (
           <TemplateCustomization
             template={template}
@@ -170,7 +181,7 @@ export default function TemplateSelectionFlow({
           />
         );
 
-      case 'confirm':
+      case "confirm":
         return (
           <div className="space-y-6">
             <div className="text-center">
@@ -181,7 +192,8 @@ export default function TemplateSelectionFlow({
                 Ready to Create Your Portfolio!
               </h2>
               <p className="text-muted-foreground">
-                Your portfolio will be created with the {template.name} template and your custom data.
+                Your portfolio will be created with the {template.name} template
+                and your custom data.
               </p>
             </div>
 
@@ -199,11 +211,13 @@ export default function TemplateSelectionFlow({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Role:</span>
-                    <span className="capitalize">{template.role.replace('-', ' ')}</span>
+                    <span className="capitalize">
+                      {template.role.replace("-", " ")}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Type:</span>
-                    <span>{template.isPremium ? 'Premium' : 'Free'}</span>
+                    <span>{template.isPremium ? "Premium" : "Free"}</span>
                   </div>
                 </div>
               </div>
@@ -235,8 +249,9 @@ export default function TemplateSelectionFlow({
 
             <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                <strong>What happens next?</strong> We'll create your portfolio with this template and data. 
-                You can always customize it further after creation.
+                <strong>What happens next?</strong> We'll create your portfolio
+                with this template and data. You can always customize it further
+                after creation.
               </p>
             </div>
           </div>
@@ -258,10 +273,12 @@ export default function TemplateSelectionFlow({
               Cancel
             </Button>
           </div>
-          
+
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Step {currentStepIndex + 1} of {steps.length}</span>
+              <span>
+                Step {currentStepIndex + 1} of {steps.length}
+              </span>
               <span>{Math.round(progress)}% complete</span>
             </div>
             <Progress value={progress} className="h-2" />
@@ -270,16 +287,23 @@ export default function TemplateSelectionFlow({
           <div className="flex justify-between">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center">
-                <div className={`
+                <div
+                  className={`
                   w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium
-                  ${step.completed 
-                    ? 'bg-green-500 text-white' 
-                    : index === currentStepIndex
-                    ? 'bg-brand-500 text-white'
-                    : 'bg-muted text-muted-foreground'
+                  ${
+                    step.completed
+                      ? "bg-green-500 text-white"
+                      : index === currentStepIndex
+                        ? "bg-brand-500 text-white"
+                        : "bg-muted text-muted-foreground"
                   }
-                `}>
-                  {step.completed ? <CheckCircle className="h-4 w-4" /> : index + 1}
+                `}
+                >
+                  {step.completed ? (
+                    <CheckCircle className="h-4 w-4" />
+                  ) : (
+                    index + 1
+                  )}
                 </div>
                 <span className="ml-2 text-sm font-medium">{step.label}</span>
               </div>
@@ -288,29 +312,33 @@ export default function TemplateSelectionFlow({
         </div>
 
         {/* Step Content */}
-        <div className="py-6">
-          {renderStepContent()}
-        </div>
+        <div className="py-6">{renderStepContent()}</div>
 
         {/* Footer Actions */}
-        {currentStep !== 'customize' && (
+        {currentStep !== "customize" && (
           <div className="flex justify-between pt-6 border-t">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleBack}
-              disabled={currentStep === 'preview'}
+              disabled={currentStep === "preview"}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
-            
-            {currentStep === 'confirm' ? (
-              <Button onClick={handleComplete} className="bg-brand-500 hover:bg-brand-600">
+
+            {currentStep === "confirm" ? (
+              <Button
+                onClick={handleComplete}
+                className="bg-brand-500 hover:bg-brand-600"
+              >
                 Create Portfolio
                 <CheckCircle className="h-4 w-4 ml-2" />
               </Button>
             ) : (
-              <Button onClick={handleNext} className="bg-brand-500 hover:bg-brand-600">
+              <Button
+                onClick={handleNext}
+                className="bg-brand-500 hover:bg-brand-600"
+              >
                 Next
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>

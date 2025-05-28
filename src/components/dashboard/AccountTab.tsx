@@ -1,7 +1,6 @@
-
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AccountTab() {
   const { user } = useAuth();
@@ -15,15 +14,15 @@ export default function AccountTab() {
 
   const fetchUserProfile = async () => {
     if (!user) return;
-    
+
     const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
       .single();
 
     if (error) {
-      console.error('Error fetching profile:', error);
+      console.error("Error fetching profile:", error);
     } else {
       setUserProfile(data);
     }
@@ -43,7 +42,9 @@ export default function AccountTab() {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="font-medium">Free Plan</p>
-                  <p className="text-sm text-muted-foreground">2/2 portfolios used</p>
+                  <p className="text-sm text-muted-foreground">
+                    2/2 portfolios used
+                  </p>
                 </div>
                 <button className="text-sm font-medium text-brand-500 hover:text-brand-600">
                   Upgrade
@@ -51,12 +52,16 @@ export default function AccountTab() {
               </div>
             </div>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-medium mb-2">Account Information</h3>
             <div className="p-4 rounded-lg border border-border bg-muted/50">
-              <p className="font-medium">{userProfile?.full_name || user?.email}</p>
-              <p className="text-sm text-muted-foreground mb-2">{user?.email}</p>
+              <p className="font-medium">
+                {userProfile?.full_name || user?.email}
+              </p>
+              <p className="text-sm text-muted-foreground mb-2">
+                {user?.email}
+              </p>
               <div className="flex gap-2 text-sm">
                 <button className="text-brand-500 hover:text-brand-600 font-medium">
                   Change email

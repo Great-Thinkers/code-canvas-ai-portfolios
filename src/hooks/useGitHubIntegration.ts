@@ -1,7 +1,6 @@
-
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface GitHubProfile {
   id: string;
@@ -39,13 +38,13 @@ export const useGitHubIntegration = () => {
 
     try {
       const { data, error } = await supabase
-        .from('github_profiles')
-        .select('*')
-        .eq('user_id', user.id)
+        .from("github_profiles")
+        .select("*")
+        .eq("user_id", user.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error checking GitHub connection:', error);
+      if (error && error.code !== "PGRST116") {
+        console.error("Error checking GitHub connection:", error);
         return;
       }
 
@@ -54,7 +53,7 @@ export const useGitHubIntegration = () => {
         setIsConnected(true);
       }
     } catch (error) {
-      console.error('Error checking GitHub connection:', error);
+      console.error("Error checking GitHub connection:", error);
     }
   };
 
@@ -63,18 +62,18 @@ export const useGitHubIntegration = () => {
     try {
       // Initiate GitHub OAuth flow
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
+        provider: "github",
         options: {
           redirectTo: `${window.location.origin}/dashboard`,
-          scopes: 'user:email read:user repo'
-        }
+          scopes: "user:email read:user repo",
+        },
       });
 
       if (error) {
         throw error;
       }
     } catch (error) {
-      console.error('Error connecting to GitHub:', error);
+      console.error("Error connecting to GitHub:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -87,9 +86,9 @@ export const useGitHubIntegration = () => {
     setLoading(true);
     try {
       const { error } = await supabase
-        .from('github_profiles')
+        .from("github_profiles")
         .delete()
-        .eq('user_id', user.id);
+        .eq("user_id", user.id);
 
       if (error) {
         throw error;
@@ -98,7 +97,7 @@ export const useGitHubIntegration = () => {
       setProfile(null);
       setIsConnected(false);
     } catch (error) {
-      console.error('Error disconnecting GitHub:', error);
+      console.error("Error disconnecting GitHub:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -111,9 +110,12 @@ export const useGitHubIntegration = () => {
     setLoading(true);
     try {
       // Call edge function to sync GitHub data
-      const { data, error } = await supabase.functions.invoke('sync-github-data', {
-        body: { user_id: user.id }
-      });
+      const { data, error } = await supabase.functions.invoke(
+        "sync-github-data",
+        {
+          body: { user_id: user.id },
+        },
+      );
 
       if (error) {
         throw error;
@@ -122,7 +124,7 @@ export const useGitHubIntegration = () => {
       // Refresh profile data
       await checkConnection();
     } catch (error) {
-      console.error('Error syncing GitHub data:', error);
+      console.error("Error syncing GitHub data:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -136,6 +138,6 @@ export const useGitHubIntegration = () => {
     connectGitHub,
     disconnectGitHub,
     syncData,
-    checkConnection
+    checkConnection,
   };
 };

@@ -1,8 +1,14 @@
-
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, RefreshCw } from "lucide-react";
 
 type IntegrationCardProps = {
   name: string;
@@ -28,28 +34,28 @@ export default function IntegrationCard({
   profileData,
 }: IntegrationCardProps) {
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    if (!dateString) return "Never";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const getProfileInfo = () => {
-    if (name === 'GitHub' && profileData) {
+    if (name === "GitHub" && profileData) {
       return {
         username: profileData.username,
         repos: profileData.public_repos,
-        followers: profileData.followers
+        followers: profileData.followers,
       };
     }
-    if (name === 'LinkedIn' && profileData) {
+    if (name === "LinkedIn" && profileData) {
       return {
-        name: `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim(),
+        name: `${profileData.first_name || ""} ${profileData.last_name || ""}`.trim(),
         headline: profileData.headline,
-        connections: profileData.connections_count
+        connections: profileData.connections_count,
       };
     }
     return null;
@@ -75,7 +81,7 @@ export default function IntegrationCard({
         {isConnected && profileInfo ? (
           <div className="text-sm space-y-2">
             <p className="font-medium">Account connected</p>
-            {name === 'GitHub' && (
+            {name === "GitHub" && (
               <div className="text-muted-foreground space-y-1">
                 <p>@{profileInfo.username}</p>
                 <div className="flex gap-4 text-xs">
@@ -84,14 +90,16 @@ export default function IntegrationCard({
                 </div>
               </div>
             )}
-            {name === 'LinkedIn' && (
+            {name === "LinkedIn" && (
               <div className="text-muted-foreground space-y-1">
                 <p>{profileInfo.name}</p>
                 {profileInfo.headline && (
                   <p className="text-xs">{profileInfo.headline}</p>
                 )}
                 {profileInfo.connections && (
-                  <p className="text-xs">{profileInfo.connections} connections</p>
+                  <p className="text-xs">
+                    {profileInfo.connections} connections
+                  </p>
                 )}
               </div>
             )}
@@ -102,7 +110,9 @@ export default function IntegrationCard({
         ) : isConnected ? (
           <div className="text-sm">
             <p className="font-medium">Account connected</p>
-            <p className="text-muted-foreground">Last synced: {formatDate(lastSynced)}</p>
+            <p className="text-muted-foreground">
+              Last synced: {formatDate(lastSynced)}
+            </p>
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">
@@ -113,9 +123,9 @@ export default function IntegrationCard({
       <CardFooter className="flex gap-2">
         {isConnected ? (
           <>
-            <Button 
-              variant="outline" 
-              className="flex-1" 
+            <Button
+              variant="outline"
+              className="flex-1"
               onClick={onDisconnect}
               disabled={loading}
             >
@@ -123,23 +133,23 @@ export default function IntegrationCard({
               Disconnect
             </Button>
             {profileInfo && (
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
-                onClick={() => {/* TODO: Implement sync */}}
+                onClick={() => {
+                  /* TODO: Implement sync */
+                }}
                 disabled={loading}
                 title="Sync data"
               >
-                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+                />
               </Button>
             )}
           </>
         ) : (
-          <Button 
-            className="w-full" 
-            onClick={onConnect}
-            disabled={loading}
-          >
+          <Button className="w-full" onClick={onConnect} disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Connect {name}
           </Button>

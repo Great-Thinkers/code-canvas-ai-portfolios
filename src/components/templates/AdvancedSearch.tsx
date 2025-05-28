@@ -1,11 +1,14 @@
-
-import { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Search, Filter, X, SlidersHorizontal } from 'lucide-react';
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Search, Filter, X, SlidersHorizontal } from "lucide-react";
 
 export interface AdvancedFilters {
   searchTerm: string;
@@ -14,7 +17,7 @@ export interface AdvancedFilters {
   features: string[];
   categories: string[];
   isPremium?: boolean;
-  sortBy: 'popular' | 'newest' | 'name' | 'category';
+  sortBy: "popular" | "newest" | "name" | "category";
 }
 
 interface AdvancedSearchProps {
@@ -26,54 +29,54 @@ interface AdvancedSearchProps {
 
 const filterOptions = {
   roles: [
-    { id: 'frontend', label: 'Frontend Developer' },
-    { id: 'backend', label: 'Backend Engineer' },
-    { id: 'fullstack', label: 'Full-stack Developer' },
-    { id: 'designer', label: 'UI/UX Designer' },
-    { id: 'mobile', label: 'Mobile Developer' },
-    { id: 'devops', label: 'DevOps Engineer' },
-    { id: 'data', label: 'Data Scientist' },
+    { id: "frontend", label: "Frontend Developer" },
+    { id: "backend", label: "Backend Engineer" },
+    { id: "fullstack", label: "Full-stack Developer" },
+    { id: "designer", label: "UI/UX Designer" },
+    { id: "mobile", label: "Mobile Developer" },
+    { id: "devops", label: "DevOps Engineer" },
+    { id: "data", label: "Data Scientist" },
   ],
   styles: [
-    { id: 'minimal', label: 'Minimalist' },
-    { id: 'modern', label: 'Modern' },
-    { id: 'creative', label: 'Creative' },
-    { id: 'professional', label: 'Professional' },
-    { id: 'dark', label: 'Dark Mode' },
-    { id: 'colorful', label: 'Colorful' },
-    { id: 'gradient', label: 'Gradient' },
+    { id: "minimal", label: "Minimalist" },
+    { id: "modern", label: "Modern" },
+    { id: "creative", label: "Creative" },
+    { id: "professional", label: "Professional" },
+    { id: "dark", label: "Dark Mode" },
+    { id: "colorful", label: "Colorful" },
+    { id: "gradient", label: "Gradient" },
   ],
   features: [
-    { id: 'projects', label: 'Project Showcase' },
-    { id: 'blog', label: 'Blog Integration' },
-    { id: 'animations', label: 'Animations' },
-    { id: 'responsive', label: 'Mobile Responsive' },
-    { id: 'seo', label: 'SEO Optimized' },
-    { id: 'contact', label: 'Contact Form' },
-    { id: 'testimonials', label: 'Testimonials' },
-    { id: 'analytics', label: 'Analytics' },
+    { id: "projects", label: "Project Showcase" },
+    { id: "blog", label: "Blog Integration" },
+    { id: "animations", label: "Animations" },
+    { id: "responsive", label: "Mobile Responsive" },
+    { id: "seo", label: "SEO Optimized" },
+    { id: "contact", label: "Contact Form" },
+    { id: "testimonials", label: "Testimonials" },
+    { id: "analytics", label: "Analytics" },
   ],
   categories: [
-    { id: 'Portfolio', label: 'Portfolio' },
-    { id: 'Developer', label: 'Developer' },
-    { id: 'Design', label: 'Design' },
-    { id: 'Mobile', label: 'Mobile' },
-    { id: 'DevOps', label: 'DevOps' },
-    { id: 'Business', label: 'Business' },
+    { id: "Portfolio", label: "Portfolio" },
+    { id: "Developer", label: "Developer" },
+    { id: "Design", label: "Design" },
+    { id: "Mobile", label: "Mobile" },
+    { id: "DevOps", label: "DevOps" },
+    { id: "Business", label: "Business" },
   ],
   sortOptions: [
-    { id: 'popular', label: 'Most Popular' },
-    { id: 'newest', label: 'Newest First' },
-    { id: 'name', label: 'Name A-Z' },
-    { id: 'category', label: 'Category' },
-  ]
+    { id: "popular", label: "Most Popular" },
+    { id: "newest", label: "Newest First" },
+    { id: "name", label: "Name A-Z" },
+    { id: "category", label: "Category" },
+  ],
 };
 
-export default function AdvancedSearch({ 
-  filters, 
-  onFiltersChange, 
-  resultCount, 
-  totalCount 
+export default function AdvancedSearch({
+  filters,
+  onFiltersChange,
+  resultCount,
+  totalCount,
 }: AdvancedSearchProps) {
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
@@ -82,14 +85,17 @@ export default function AdvancedSearch({
   };
 
   const handleFilterToggle = (
-    filterType: keyof Pick<AdvancedFilters, 'roles' | 'styles' | 'features' | 'categories'>,
-    value: string
+    filterType: keyof Pick<
+      AdvancedFilters,
+      "roles" | "styles" | "features" | "categories"
+    >,
+    value: string,
   ) => {
     const currentValues = filters[filterType];
     const newValues = currentValues.includes(value)
-      ? currentValues.filter(v => v !== value)
+      ? currentValues.filter((v) => v !== value)
       : [...currentValues, value];
-    
+
     onFiltersChange({ ...filters, [filterType]: newValues });
   };
 
@@ -98,32 +104,32 @@ export default function AdvancedSearch({
     onFiltersChange({ ...filters, isPremium: newValue });
   };
 
-  const handleSortChange = (sortBy: AdvancedFilters['sortBy']) => {
+  const handleSortChange = (sortBy: AdvancedFilters["sortBy"]) => {
     onFiltersChange({ ...filters, sortBy });
   };
 
   const clearAllFilters = () => {
     onFiltersChange({
-      searchTerm: '',
+      searchTerm: "",
       roles: [],
       styles: [],
       features: [],
       categories: [],
       isPremium: undefined,
-      sortBy: 'popular'
+      sortBy: "popular",
     });
   };
 
-  const hasActiveFilters = 
-    filters.searchTerm !== '' ||
+  const hasActiveFilters =
+    filters.searchTerm !== "" ||
     filters.roles.length > 0 ||
     filters.styles.length > 0 ||
     filters.features.length > 0 ||
     filters.categories.length > 0 ||
     filters.isPremium !== undefined ||
-    filters.sortBy !== 'popular';
+    filters.sortBy !== "popular";
 
-  const activeFilterCount = 
+  const activeFilterCount =
     (filters.searchTerm ? 1 : 0) +
     filters.roles.length +
     filters.styles.length +
@@ -144,15 +150,15 @@ export default function AdvancedSearch({
             className="pl-10"
           />
         </div>
-        
+
         <Popover open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" className="relative">
               <SlidersHorizontal className="h-4 w-4 mr-2" />
               Filters
               {activeFilterCount > 0 && (
-                <Badge 
-                  variant="secondary" 
+                <Badge
+                  variant="secondary"
                   className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
                 >
                   {activeFilterCount}
@@ -173,14 +179,20 @@ export default function AdvancedSearch({
 
               {/* Sort By */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Sort By</label>
+                <label className="text-sm font-medium mb-2 block">
+                  Sort By
+                </label>
                 <div className="grid grid-cols-2 gap-2">
                   {filterOptions.sortOptions.map((option) => (
                     <Button
                       key={option.id}
-                      variant={filters.sortBy === option.id ? "default" : "outline"}
+                      variant={
+                        filters.sortBy === option.id ? "default" : "outline"
+                      }
                       size="sm"
-                      onClick={() => handleSortChange(option.id as AdvancedFilters['sortBy'])}
+                      onClick={() =>
+                        handleSortChange(option.id as AdvancedFilters["sortBy"])
+                      }
                     >
                       {option.label}
                     </Button>
@@ -196,7 +208,10 @@ export default function AdvancedSearch({
                     checked={filters.isPremium === true}
                     onCheckedChange={handlePremiumToggle}
                   />
-                  <label htmlFor="premium" className="text-sm font-medium cursor-pointer">
+                  <label
+                    htmlFor="premium"
+                    className="text-sm font-medium cursor-pointer"
+                  >
                     Premium Templates Only
                   </label>
                 </div>
@@ -204,17 +219,24 @@ export default function AdvancedSearch({
 
               {/* Category Filter */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Categories</label>
+                <label className="text-sm font-medium mb-2 block">
+                  Categories
+                </label>
                 <div className="grid grid-cols-2 gap-2">
                   {filterOptions.categories.map((category) => (
-                    <div key={category.id} className="flex items-center space-x-2">
+                    <div
+                      key={category.id}
+                      className="flex items-center space-x-2"
+                    >
                       <Checkbox
                         id={`category-${category.id}`}
                         checked={filters.categories.includes(category.id)}
-                        onCheckedChange={() => handleFilterToggle('categories', category.id)}
+                        onCheckedChange={() =>
+                          handleFilterToggle("categories", category.id)
+                        }
                       />
-                      <label 
-                        htmlFor={`category-${category.id}`} 
+                      <label
+                        htmlFor={`category-${category.id}`}
                         className="text-sm cursor-pointer"
                       >
                         {category.label}
@@ -226,17 +248,21 @@ export default function AdvancedSearch({
 
               {/* Role Filter */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Developer Roles</label>
+                <label className="text-sm font-medium mb-2 block">
+                  Developer Roles
+                </label>
                 <div className="space-y-2">
                   {filterOptions.roles.map((role) => (
                     <div key={role.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={`role-${role.id}`}
                         checked={filters.roles.includes(role.id)}
-                        onCheckedChange={() => handleFilterToggle('roles', role.id)}
+                        onCheckedChange={() =>
+                          handleFilterToggle("roles", role.id)
+                        }
                       />
-                      <label 
-                        htmlFor={`role-${role.id}`} 
+                      <label
+                        htmlFor={`role-${role.id}`}
                         className="text-sm cursor-pointer"
                       >
                         {role.label}
@@ -248,17 +274,21 @@ export default function AdvancedSearch({
 
               {/* Style Filter */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Design Styles</label>
+                <label className="text-sm font-medium mb-2 block">
+                  Design Styles
+                </label>
                 <div className="space-y-2">
                   {filterOptions.styles.map((style) => (
                     <div key={style.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={`style-${style.id}`}
                         checked={filters.styles.includes(style.id)}
-                        onCheckedChange={() => handleFilterToggle('styles', style.id)}
+                        onCheckedChange={() =>
+                          handleFilterToggle("styles", style.id)
+                        }
                       />
-                      <label 
-                        htmlFor={`style-${style.id}`} 
+                      <label
+                        htmlFor={`style-${style.id}`}
                         className="text-sm cursor-pointer"
                       >
                         {style.label}
@@ -270,17 +300,24 @@ export default function AdvancedSearch({
 
               {/* Features Filter */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Features</label>
+                <label className="text-sm font-medium mb-2 block">
+                  Features
+                </label>
                 <div className="space-y-2">
                   {filterOptions.features.map((feature) => (
-                    <div key={feature.id} className="flex items-center space-x-2">
+                    <div
+                      key={feature.id}
+                      className="flex items-center space-x-2"
+                    >
                       <Checkbox
                         id={`feature-${feature.id}`}
                         checked={filters.features.includes(feature.id)}
-                        onCheckedChange={() => handleFilterToggle('features', feature.id)}
+                        onCheckedChange={() =>
+                          handleFilterToggle("features", feature.id)
+                        }
                       />
-                      <label 
-                        htmlFor={`feature-${feature.id}`} 
+                      <label
+                        htmlFor={`feature-${feature.id}`}
                         className="text-sm cursor-pointer"
                       >
                         {feature.label}
@@ -298,22 +335,22 @@ export default function AdvancedSearch({
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2 items-center">
           <span className="text-sm text-muted-foreground">Active filters:</span>
-          
+
           {filters.searchTerm && (
             <Badge variant="secondary" className="gap-1">
               Search: "{filters.searchTerm}"
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => handleSearchChange('')}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => handleSearchChange("")}
               />
             </Badge>
           )}
-          
+
           {filters.isPremium && (
             <Badge variant="secondary" className="gap-1">
               Premium Only
-              <X 
-                className="h-3 w-3 cursor-pointer" 
+              <X
+                className="h-3 w-3 cursor-pointer"
                 onClick={handlePremiumToggle}
               />
             </Badge>
@@ -321,40 +358,40 @@ export default function AdvancedSearch({
 
           {filters.categories.map((category) => (
             <Badge key={category} variant="secondary" className="gap-1">
-              {filterOptions.categories.find(c => c.id === category)?.label}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => handleFilterToggle('categories', category)}
+              {filterOptions.categories.find((c) => c.id === category)?.label}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => handleFilterToggle("categories", category)}
               />
             </Badge>
           ))}
 
           {filters.roles.map((role) => (
             <Badge key={role} variant="secondary" className="gap-1">
-              {filterOptions.roles.find(r => r.id === role)?.label}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => handleFilterToggle('roles', role)}
+              {filterOptions.roles.find((r) => r.id === role)?.label}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => handleFilterToggle("roles", role)}
               />
             </Badge>
           ))}
 
           {filters.styles.map((style) => (
             <Badge key={style} variant="secondary" className="gap-1">
-              {filterOptions.styles.find(s => s.id === style)?.label}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => handleFilterToggle('styles', style)}
+              {filterOptions.styles.find((s) => s.id === style)?.label}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => handleFilterToggle("styles", style)}
               />
             </Badge>
           ))}
 
           {filters.features.map((feature) => (
             <Badge key={feature} variant="secondary" className="gap-1">
-              {filterOptions.features.find(f => f.id === feature)?.label}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => handleFilterToggle('features', feature)}
+              {filterOptions.features.find((f) => f.id === feature)?.label}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => handleFilterToggle("features", feature)}
               />
             </Badge>
           ))}
@@ -369,11 +406,12 @@ export default function AdvancedSearch({
       <div className="flex justify-between items-center text-sm text-muted-foreground">
         <span>
           Showing {resultCount} of {totalCount} templates
-          {hasActiveFilters && ' (filtered)'}
+          {hasActiveFilters && " (filtered)"}
         </span>
         {hasActiveFilters && (
           <span>
-            {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} applied
+            {activeFilterCount} filter{activeFilterCount !== 1 ? "s" : ""}{" "}
+            applied
           </span>
         )}
       </div>
