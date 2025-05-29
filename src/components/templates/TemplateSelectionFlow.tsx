@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle, ArrowLeft, ArrowRight, Crown } from "lucide-react";
-import TemplateCustomization from "./TemplateCustomization";
+import EnhancedTemplateCustomization from "@/components/portfolio/EnhancedTemplateCustomization";
 
 interface Template {
   id: number;
@@ -174,7 +174,7 @@ export default function TemplateSelectionFlow({
 
       case "customize":
         return (
-          <TemplateCustomization
+          <EnhancedTemplateCustomization
             template={template}
             onNext={handleCustomizationNext}
             onBack={handleBack}
