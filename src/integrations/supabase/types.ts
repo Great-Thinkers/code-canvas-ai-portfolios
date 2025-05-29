@@ -309,14 +309,62 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_exports: {
+        Row: {
+          created_at: string
+          download_url: string | null
+          error_message: string | null
+          export_type: string
+          id: string
+          portfolio_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          download_url?: string | null
+          error_message?: string | null
+          export_type: string
+          id?: string
+          portfolio_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          download_url?: string | null
+          error_message?: string | null
+          export_type?: string
+          id?: string
+          portfolio_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_exports_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       portfolios: {
         Row: {
           created_at: string
           custom_domain: string | null
+          export_status: string | null
+          export_url: string | null
           id: string
           is_published: boolean
+          last_exported_at: string | null
           name: string
           portfolio_data: Json
+          preview_url: string | null
           template_id: number
           template_name: string
           updated_at: string
@@ -325,10 +373,14 @@ export type Database = {
         Insert: {
           created_at?: string
           custom_domain?: string | null
+          export_status?: string | null
+          export_url?: string | null
           id?: string
           is_published?: boolean
+          last_exported_at?: string | null
           name: string
           portfolio_data?: Json
+          preview_url?: string | null
           template_id: number
           template_name: string
           updated_at?: string
@@ -337,10 +389,14 @@ export type Database = {
         Update: {
           created_at?: string
           custom_domain?: string | null
+          export_status?: string | null
+          export_url?: string | null
           id?: string
           is_published?: boolean
+          last_exported_at?: string | null
           name?: string
           portfolio_data?: Json
+          preview_url?: string | null
           template_id?: number
           template_name?: string
           updated_at?: string
