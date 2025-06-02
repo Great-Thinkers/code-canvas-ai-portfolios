@@ -64,7 +64,8 @@ export default function PortfolioEditorSections({
   const [previewTemplate, setPreviewTemplate] = useState<TemplateTheme | null>(null);
   const [showPreview, setShowPreview] = useState(false);
 
-  const currentTemplate = getTemplateById(templateName) || getTemplateById('modern-minimal')!;
+  const currentTemplateId = portfolioData.template || templateName;
+  const currentTemplate = getTemplateById(currentTemplateId) || getTemplateById('modern-minimal')!;
   const customization: TemplateCustomization = portfolioData.customization || {
     templateId: currentTemplate.id,
   };

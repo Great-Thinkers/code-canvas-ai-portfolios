@@ -4,25 +4,19 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ExternalLink, Download, Share2, ArrowLeft } from "lucide-react";
+import { ArrowLeft, Edit, Share, Download } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import PortfolioExportDialog from "@/components/portfolio/PortfolioExportDialog";
+import PortfolioRenderer from "@/components/portfolio/PortfolioRenderer";
 
 interface Portfolio {
   id: string;
   name: string;
   template_name: string;
   is_published: boolean;
-  preview_url: string | null;
-  export_status: string | null;
-  export_url: string | null;
-  last_exported_at: string | null;
   portfolio_data: any;
 }
 
@@ -32,7 +26,6 @@ function PortfolioPreviewContent() {
   const { user } = useAuth();
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [loading, setLoading] = useState(true);
-  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   useEffect(() => {
     if (id && user) {
@@ -68,55 +61,14 @@ function PortfolioPreviewContent() {
     }
   };
 
-  const handlePublishToggle = async () => {
-    if (!portfolio) return;
-
-    try {
-      const { error } = await supabase
-        .from("portfolios")
-        .update({ is_published: !portfolio.is_published })
-        .eq("id", portfolio.id);
-
-      if (error) {
-        console.error("Error updating portfolio:", error);
-        toast.error("Failed to update portfolio status");
-        return;
-      }
-
-      setPortfolio({ ...portfolio, is_published: !portfolio.is_published });
-      toast.success(
-        portfolio.is_published 
-          ? "Portfolio unpublished successfully" 
-          : "Portfolio published successfully"
-      );
-    } catch (error) {
-      console.error("Unexpected error:", error);
-      toast.error("An unexpected error occurred");
-    }
-  };
-
-  const handleShare = () => {
-    if (portfolio?.preview_url) {
-      navigator.clipboard.writeText(portfolio.preview_url);
-      toast.success("Preview URL copied to clipboard!");
-    } else {
-      toast.error("No preview URL available");
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen">
         <Navbar />
-        <main className="flex-1 container py-8">
-          <div className="space-y-6">
-            <Skeleton className="h-8 w-64" />
+        <main className="flex-1">
+          <div className="container py-8">
+            <Skeleton className="h-8 w-64 mb-6" />
             <Skeleton className="h-96 w-full" />
-            <div className="flex gap-4">
-              <Skeleton className="h-10 w-32" />
-              <Skeleton className="h-10 w-32" />
-              <Skeleton className="h-10 w-32" />
-            </div>
           </div>
         </main>
         <Footer />
@@ -145,9 +97,10 @@ function PortfolioPreviewContent() {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-1 container py-8">
-        <div className="space-y-6">
-          {/* Header */}
+      
+      {/* Preview Header */}
+      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-16 z-40">
+        <div className="container py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button
@@ -159,130 +112,41 @@ function PortfolioPreviewContent() {
                 Back to Dashboard
               </Button>
               <div>
-                <h1 className="text-2xl font-bold">{portfolio.name}</h1>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge variant="outline">{portfolio.template_name}</Badge>
-                  <Badge variant={portfolio.is_published ? "default" : "secondary"}>
-                    {portfolio.is_published ? "Published" : "Draft"}
-                  </Badge>
-                </div>
+                <h1 className="text-xl font-semibold">{portfolio.name} - Preview</h1>
+                <p className="text-sm text-muted-foreground">
+                  Template: {portfolio.template_name}
+                </p>
               </div>
             </div>
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={handleShare}
-                disabled={!portfolio.preview_url}
+                onClick={() => navigate(`/dashboard/edit/${portfolio.id}`)}
               >
-                <Share2 className="h-4 w-4 mr-2" />
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+              <Button variant="outline" disabled>
+                <Share className="h-4 w-4 mr-2" />
                 Share
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => setExportDialogOpen(true)}
-              >
+              <Button variant="outline" disabled>
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button onClick={handlePublishToggle}>
-                {portfolio.is_published ? "Unpublish" : "Publish"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => navigate(`/dashboard/edit/${portfolio.id}`)}
-              >
-                Edit Portfolio
-              </Button>
             </div>
           </div>
-
-          {/* Preview */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                Portfolio Preview
-                {portfolio.preview_url && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => window.open(portfolio.preview_url!, "_blank")}
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="aspect-video bg-muted rounded-lg border overflow-hidden">
-                {portfolio.preview_url ? (
-                  <iframe
-                    src={portfolio.preview_url}
-                    className="w-full h-full"
-                    title={`Preview of ${portfolio.name}`}
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-muted-foreground">
-                    <div className="text-center">
-                      <h3 className="font-medium mb-2">Preview not available</h3>
-                      <p className="text-sm">
-                        Generate a preview by publishing your portfolio
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Export Status */}
-          {portfolio.export_status && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Export Status</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Badge
-                      variant={
-                        portfolio.export_status === "completed"
-                          ? "default"
-                          : portfolio.export_status === "failed"
-                          ? "destructive"
-                          : "secondary"
-                      }
-                    >
-                      {portfolio.export_status}
-                    </Badge>
-                    {portfolio.last_exported_at && (
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Last exported: {new Date(portfolio.last_exported_at).toLocaleDateString()}
-                      </p>
-                    )}
-                  </div>
-                  {portfolio.export_url && portfolio.export_status === "completed" && (
-                    <Button
-                      variant="outline"
-                      onClick={() => window.open(portfolio.export_url!, "_blank")}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </div>
-      </main>
-      <Footer />
+      </div>
 
-      <PortfolioExportDialog
-        portfolio={portfolio}
-        open={exportDialogOpen}
-        onOpenChange={setExportDialogOpen}
-        onExportComplete={fetchPortfolio}
-      />
+      {/* Portfolio Content */}
+      <main className="flex-1">
+        <PortfolioRenderer
+          templateId={portfolio.template_name}
+          customization={portfolio.portfolio_data?.customization}
+          portfolioData={portfolio.portfolio_data}
+        />
+      </main>
     </div>
   );
 }
