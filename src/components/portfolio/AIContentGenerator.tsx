@@ -8,7 +8,7 @@ import { useAIContentGeneration } from '@/hooks/useAIContentGeneration';
 import { toast } from 'sonner';
 
 interface AIContentGeneratorProps {
-  type: 'bio' | 'project-description' | 'skill-summary';
+  type: 'bio' | 'project_description' | 'skill_summary' | 'experience_summary';
   context: {
     name?: string;
     title?: string;
@@ -36,9 +36,14 @@ export default function AIContentGenerator({
 
   const handleGenerate = async () => {
     try {
-      const content = await generateContent({ type, context });
-      onChange(content);
-      toast.success('Content generated successfully!');
+      const content = await generateContent({ 
+        contentType: type, 
+        tone: 'professional'
+      });
+      if (content) {
+        onChange(content);
+        toast.success('Content generated successfully!');
+      }
     } catch (error) {
       toast.error('Failed to generate content. Please try again.');
     }
@@ -47,11 +52,12 @@ export default function AIContentGenerator({
   const handleGenerateVariations = async () => {
     try {
       const variations = await Promise.all([
-        generateContent({ type, context }),
-        generateContent({ type, context }),
-        generateContent({ type, context }),
+        generateContent({ contentType: type, tone: 'professional' }),
+        generateContent({ contentType: type, tone: 'casual' }),
+        generateContent({ contentType: type, tone: 'creative' }),
       ]);
-      setSuggestions(variations);
+      const validVariations = variations.filter(Boolean) as string[];
+      setSuggestions(validVariations);
     } catch (error) {
       toast.error('Failed to generate variations. Please try again.');
     }
