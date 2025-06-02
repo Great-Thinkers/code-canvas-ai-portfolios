@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sparkles } from "lucide-react";
 
 type PortfolioCardProps = {
   id: string;
@@ -38,6 +40,12 @@ export default function PortfolioCard({
         <div className="absolute top-3 right-3">
           <Badge variant={isPublished ? "default" : "secondary"}>
             {isPublished ? "Published" : "Draft"}
+          </Badge>
+        </div>
+        <div className="absolute top-3 left-3">
+          <Badge variant="outline" className="bg-background/80 backdrop-blur-sm">
+            <Sparkles className="h-3 w-3 mr-1" />
+            AI Ready
           </Badge>
         </div>
       </div>
@@ -73,6 +81,10 @@ export default function PortfolioCard({
                 <Link to={`/dashboard/edit/${id}`} className="w-full flex">
                   Edit
                 </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Generate AI Content
               </DropdownMenuItem>
               <DropdownMenuItem>Duplicate</DropdownMenuItem>
               <DropdownMenuSeparator />

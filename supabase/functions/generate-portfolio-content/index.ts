@@ -1,58 +1,106 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface GenerateContentRequest {
-  type: 'bio' | 'project-description' | 'skill-summary';
-  context: {
-    name?: string;
-    title?: string;
-    skills?: string[];
-    experience?: any[];
-    repositories?: any[];
-    role?: string;
-  };
-}
-
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const { type, context }: GenerateContentRequest = await req.json();
+    const { userId, contentType, tone, currentContent, customPrompt } = await req.json();
 
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openaiApiKey) {
-      throw new Error('OpenAI API key not configured');
-    }
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
 
-    // Build context-aware prompts based on the content type
-    let prompt = '';
+    // Fetch user's GitHub and LinkedIn data
+    const { data: githubProfile } = await supabaseClient
+      .from('github_profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    const { data: linkedinProfile } = await supabaseClient
+      .from('linkedin_profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    const { data: githubRepos } = await supabaseClient
+      .from('github_repositories')
+      .select('*')
+      .eq('github_profile_id', githubProfile?.id)
+      .order('stargazers_count', { ascending: false })
+      .limit(10);
+
+    const { data: linkedinExperiences } = await supabaseClient
+      .from('linkedin_experiences')
+      .select('*')
+      .eq('linkedin_profile_id', linkedinProfile?.id)
+      .order('start_date', { ascending: false });
+
+    const { data: linkedinEducation } = await supabaseClient
+      .from('linkedin_education')
+      .select('*')
+      .eq('linkedin_profile_id', linkedinProfile?.id)
+      .order('start_date', { ascending: false });
+
+    // Build context for AI
+    const userContext = {
+      github: {
+        username: githubProfile?.username,
+        bio: githubProfile?.bio,
+        company: githubProfile?.company,
+        location: githubProfile?.location,
+        publicRepos: githubProfile?.public_repos,
+        followers: githubProfile?.followers,
+        repositories: githubRepos?.map(repo => ({
+          name: repo.name,
+          description: repo.description,
+          language: repo.language,
+          stars: repo.stargazers_count,
+          topics: repo.topics,
+        })),
+      },
+      linkedin: {
+        firstName: linkedinProfile?.first_name,
+        lastName: linkedinProfile?.last_name,
+        headline: linkedinProfile?.headline,
+        summary: linkedinProfile?.summary,
+        location: linkedinProfile?.location,
+        industry: linkedinProfile?.industry,
+        experiences: linkedinExperiences?.map(exp => ({
+          title: exp.title,
+          company: exp.company_name,
+          description: exp.description,
+          startDate: exp.start_date,
+          endDate: exp.end_date,
+          isCurrent: exp.is_current,
+        })),
+        education: linkedinEducation?.map(edu => ({
+          institution: edu.institution_name,
+          degree: edu.degree,
+          fieldOfStudy: edu.field_of_study,
+          description: edu.description,
+        })),
+      },
+    };
+
+    // Generate content based on type and context
+    const prompt = buildPrompt(contentType, tone, userContext, currentContent, customPrompt);
     
-    switch (type) {
-      case 'bio':
-        prompt = generateBioPrompt(context);
-        break;
-      case 'project-description':
-        prompt = generateProjectDescriptionPrompt(context);
-        break;
-      case 'skill-summary':
-        prompt = generateSkillSummaryPrompt(context);
-        break;
-      default:
-        throw new Error('Invalid content type');
-    }
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Call OpenAI API (you would need to set up OpenAI API key in secrets)
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -60,115 +108,109 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a professional portfolio writer who creates engaging, authentic content for developers and professionals. Write in a natural, professional tone that showcases expertise without being overly promotional.'
+            content: 'You are a professional portfolio content writer. Generate engaging, professional content based on the user\'s data and requirements.',
           },
           {
             role: 'user',
-            content: prompt
-          }
+            content: prompt,
+          },
         ],
         max_tokens: 500,
         temperature: 0.7,
       }),
     });
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+    if (!openaiResponse.ok) {
+      throw new Error('Failed to generate content with AI');
     }
 
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content;
+    const openaiData = await openaiResponse.json();
+    const generatedContent = openaiData.choices[0]?.message?.content;
 
-    if (!content) {
+    if (!generatedContent) {
       throw new Error('No content generated');
     }
 
     return new Response(
-      JSON.stringify({ content: content.trim() }),
+      JSON.stringify({ content: generatedContent }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
       },
     );
-
   } catch (error) {
     console.error('Error generating content:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
-        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
       },
     );
   }
 });
 
-function generateBioPrompt(context: any): string {
-  const { name, title, skills, experience, repositories, role } = context;
-  
-  let prompt = `Write a professional bio for ${name || 'a developer'} who is a ${title || 'software developer'}.`;
-  
-  if (role) {
-    prompt += ` This bio is for a ${role.replace('-', ' ')} portfolio.`;
-  }
-  
-  if (skills && skills.length > 0) {
-    prompt += ` Their key skills include: ${skills.slice(0, 8).join(', ')}.`;
-  }
-  
-  if (experience && experience.length > 0) {
-    const recentExp = experience[0];
-    prompt += ` They have experience as ${recentExp.title} at ${recentExp.companyName}.`;
-  }
-  
-  if (repositories && repositories.length > 0) {
-    const topRepos = repositories.slice(0, 3).map(repo => repo.name).join(', ');
-    prompt += ` Some of their notable projects include: ${topRepos}.`;
-  }
-  
-  prompt += ' Write a 2-3 sentence bio that is engaging, professional, and highlights their expertise. Focus on their impact and what makes them unique.';
-  
-  return prompt;
-}
+function buildPrompt(contentType: string, tone: string, userContext: any, currentContent?: string, customPrompt?: string): string {
+  const baseContext = `
+User Data:
+- Name: ${userContext.linkedin.firstName} ${userContext.linkedin.lastName}
+- GitHub: ${userContext.github.username}
+- LinkedIn Headline: ${userContext.linkedin.headline}
+- Location: ${userContext.linkedin.location || userContext.github.location}
+- Industry: ${userContext.linkedin.industry}
 
-function generateProjectDescriptionPrompt(context: any): string {
-  const { repositories, skills } = context;
-  
-  let prompt = 'Write a brief project description for a software project.';
-  
-  if (repositories && repositories.length > 0) {
-    const repo = repositories[0];
-    prompt += ` The project is called "${repo.name}"`;
-    if (repo.description) {
-      prompt += ` and currently has this description: "${repo.description}"`;
-    }
-    if (repo.language) {
-      prompt += ` and is built with ${repo.language}`;
-    }
-  }
-  
-  if (skills && skills.length > 0) {
-    prompt += `. Technologies that might be relevant: ${skills.join(', ')}.`;
-  }
-  
-  prompt += ' Write a compelling 1-2 sentence description that explains what the project does and its value.';
-  
-  return prompt;
-}
+GitHub Profile:
+- Bio: ${userContext.github.bio}
+- Public Repos: ${userContext.github.publicRepos}
+- Top Projects: ${userContext.github.repositories?.slice(0, 5).map(repo => `${repo.name} (${repo.language}, ${repo.stars} stars)`).join(', ')}
 
-function generateSkillSummaryPrompt(context: any): string {
-  const { skills, role, experience } = context;
+Recent Experience: ${userContext.linkedin.experiences?.slice(0, 3).map(exp => `${exp.title} at ${exp.company}`).join(', ')}
+
+Education: ${userContext.linkedin.education?.map(edu => `${edu.degree} in ${edu.fieldOfStudy} from ${edu.institution}`).join(', ')}
+`;
+
+  let specificPrompt = '';
   
-  let prompt = `Write a brief summary of technical skills for a ${role?.replace('-', ' ') || 'developer'}.`;
-  
-  if (skills && skills.length > 0) {
-    prompt += ` Their skills include: ${skills.join(', ')}.`;
+  switch (contentType) {
+    case 'bio':
+      specificPrompt = `Generate a professional bio (2-3 paragraphs) that highlights the person's expertise, background, and unique value proposition.`;
+      break;
+    case 'project_description':
+      specificPrompt = `Generate compelling descriptions for their top GitHub projects that highlight technical skills and impact.`;
+      break;
+    case 'skill_summary':
+      specificPrompt = `Create a skills summary that showcases their technical expertise based on their GitHub repositories and LinkedIn experience.`;
+      break;
+    case 'experience_summary':
+      specificPrompt = `Write a professional experience summary that highlights their career progression and achievements.`;
+      break;
   }
-  
-  if (experience && experience.length > 0) {
-    prompt += ` They have ${experience.length} role(s) of experience.`;
+
+  let toneInstruction = '';
+  switch (tone) {
+    case 'professional':
+      toneInstruction = 'Use a formal, business-appropriate tone.';
+      break;
+    case 'casual':
+      toneInstruction = 'Use a friendly, approachable tone.';
+      break;
+    case 'creative':
+      toneInstruction = 'Use an innovative, artistic tone.';
+      break;
+    case 'technical':
+      toneInstruction = 'Use a detail-oriented, precise tone.';
+      break;
   }
-  
-  prompt += ' Write a 1-2 sentence summary that groups and highlights their key technical competencies.';
-  
-  return prompt;
+
+  return `${baseContext}
+
+${specificPrompt}
+
+Tone: ${toneInstruction}
+
+${currentContent ? `Current content to improve/replace: ${currentContent}` : ''}
+
+${customPrompt ? `Additional requirements: ${customPrompt}` : ''}
+
+Generate high-quality, engaging content that would be perfect for a developer portfolio. Make it specific to this person's background and experience.`;
 }

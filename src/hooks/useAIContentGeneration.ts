@@ -1,74 +1,68 @@
 
-import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
-interface GenerateContentRequest {
-  type: 'bio' | 'project-description' | 'skill-summary';
-  context: {
-    name?: string;
-    title?: string;
-    skills?: string[];
-    experience?: any[];
-    repositories?: any[];
-    role?: string;
-  };
+export type ContentType = "bio" | "project_description" | "skill_summary" | "experience_summary";
+
+export interface GenerateContentOptions {
+  contentType: ContentType;
+  tone: string;
+  currentContent?: string;
+  customPrompt?: string;
 }
 
-export const useAIContentGeneration = () => {
+export function useAIContentGeneration() {
+  const { user } = useAuth();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [generatedContent, setGeneratedContent] = useState<string>("");
 
-  const generateContent = async (request: GenerateContentRequest): Promise<string> => {
+  const generateContent = async (options: GenerateContentOptions): Promise<string | null> => {
+    if (!user) {
+      toast.error("User not authenticated");
+      return null;
+    }
+
     setIsGenerating(true);
-    setError(null);
-
     try {
-      const { data, error } = await supabase.functions.invoke('generate-portfolio-content', {
-        body: request,
+      const { data, error } = await supabase.functions.invoke("generate-portfolio-content", {
+        body: {
+          userId: user.id,
+          ...options,
+        },
       });
 
       if (error) {
-        throw error;
+        console.error("Error generating content:", error);
+        toast.error("Failed to generate content");
+        return null;
       }
 
-      return data.content;
-    } catch (err) {
-      console.error('Error generating AI content:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate content';
-      setError(errorMessage);
-      throw new Error(errorMessage);
+      if (data?.content) {
+        setGeneratedContent(data.content);
+        return data.content;
+      } else {
+        toast.error("No content was generated");
+        return null;
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("An unexpected error occurred");
+      return null;
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const generateBio = async (context: GenerateContentRequest['context']) => {
-    return generateContent({
-      type: 'bio',
-      context,
-    });
-  };
-
-  const generateProjectDescription = async (context: GenerateContentRequest['context']) => {
-    return generateContent({
-      type: 'project-description',
-      context,
-    });
-  };
-
-  const generateSkillSummary = async (context: GenerateContentRequest['context']) => {
-    return generateContent({
-      type: 'skill-summary',
-      context,
-    });
+  const clearGeneratedContent = () => {
+    setGeneratedContent("");
   };
 
   return {
     generateContent,
-    generateBio,
-    generateProjectDescription,
-    generateSkillSummary,
+    generatedContent,
     isGenerating,
-    error,
+    clearGeneratedContent,
   };
-};
+}
