@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -63,6 +64,29 @@ export default function PortfolioEditorSections({
   const [activeSection, setActiveSection] = useState("content");
   const [previewTemplate, setPreviewTemplate] = useState<TemplateTheme | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [orderedSections, setOrderedSections] = useState(contentSections);
+
+  useEffect(() => {
+    if (portfolioData.sectionOrder) {
+      const newOrderedSections = portfolioData.sectionOrder.map((id: string) =>
+        contentSections.find(section => section.id === id)
+      ).filter((section: any) => section !== undefined);
+      // Add any missing sections from contentSections
+      contentSections.forEach(section => {
+        if (!newOrderedSections.find((s: any) => s.id === section.id)) {
+          newOrderedSections.push(section);
+        }
+      });
+      setOrderedSections(newOrderedSections);
+    } else {
+      // Initialize sectionOrder if not present
+      onChange({
+        ...portfolioData,
+        sectionOrder: contentSections.map(s => s.id),
+      });
+      setOrderedSections(contentSections);
+    }
+  }, [portfolioData.sectionOrder, onChange]);
 
   const currentTemplateId = portfolioData.template || templateName;
   const currentTemplate = getTemplateById(currentTemplateId) || getTemplateById('modern-minimal')!;
@@ -72,7 +96,22 @@ export default function PortfolioEditorSections({
 
   const handleSectionChange = (sectionId: string, sectionData: any) => {
     onChange({
+      ...portfolioData,
       [sectionId]: sectionData,
+    });
+  };
+
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const items = Array.from(orderedSections);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setOrderedSections(items);
+    onChange({
+      ...portfolioData,
+      sectionOrder: items.map(section => section.id),
     });
   };
 
@@ -138,27 +177,48 @@ export default function PortfolioEditorSections({
 
         {/* Content Tab */}
         <TabsContent value="content" className="mt-6">
-          <Tabs value="personal" onValueChange={() => {}}>
-            <TabsList className="grid grid-cols-6 w-full">
-              {contentSections.map((section) => (
-                <TabsTrigger key={section.id} value={section.id} className="text-xs">
-                  {section.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Tabs value={orderedSections[0]?.id || "personal"} onValueChange={() => {}}>
+              <Droppable droppableId="sections" direction="horizontal">
+                {(provided) => (
+                  <TabsList
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className="grid grid-cols-6 w-full"
+                  >
+                    {orderedSections.map((section, index) => (
+                      <Draggable key={section.id} draggableId={section.id} index={index}>
+                        {(provided) => (
+                          <TabsTrigger
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            value={section.id}
+                            className="text-xs"
+                          >
+                            {section.label}
+                          </TabsTrigger>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </TabsList>
+                )}
+              </Droppable>
 
-            {contentSections.map((section) => {
-              const SectionComponent = section.component;
-              return (
-                <TabsContent key={section.id} value={section.id} className="mt-6">
-                  <SectionComponent
-                    data={portfolioData[section.id] || {}}
-                    onChange={(data: any) => handleSectionChange(section.id, data)}
-                  />
-                </TabsContent>
-              );
-            })}
-          </Tabs>
+              {orderedSections.map((section) => {
+                const SectionComponent = section.component;
+                return (
+                  <TabsContent key={section.id} value={section.id} className="mt-6">
+                    <SectionComponent
+                      data={portfolioData[section.id] || {}}
+                      onChange={(data: any) => handleSectionChange(section.id, data)}
+                    />
+                  </TabsContent>
+                );
+              })}
+            </Tabs>
+          </DragDropContext>
         </TabsContent>
 
         {/* Template Tab */}
