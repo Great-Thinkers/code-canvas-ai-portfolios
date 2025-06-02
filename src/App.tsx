@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import CreatePortfolio from "./pages/CreatePortfolio";
 import NotFound from "./pages/NotFound";
 import PortfolioPreview from "./pages/PortfolioPreview";
+import PortfolioEditor from "./pages/PortfolioEditor";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,6 +48,7 @@ const App: React.FC = () => {
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/dashboard/create" element={<CreatePortfolio />} />
                   <Route path="/dashboard/preview/:id" element={<PortfolioPreview />} />
+                  <Route path="/dashboard/edit/:id" element={<PortfolioEditor />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
