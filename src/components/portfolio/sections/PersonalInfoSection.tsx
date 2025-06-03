@@ -1,108 +1,170 @@
 
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import AIContentGenerator from "../AIContentGenerator";
+import { Textarea } from "@/components/ui/textarea";
+import AIContentButton from "../AIContentButton";
+import AIContentGeneratorDialog from "../AIContentGeneratorDialog";
 
-interface PersonalInfoSectionProps {
-  data: {
-    name?: string;
-    title?: string;
-    bio?: string;
-    email?: string;
-    phone?: string;
-    location?: string;
-  };
-  onChange: (data: any) => void;
+interface PersonalInfoData {
+  fullName?: string;
+  title?: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  website?: string;
+  bio?: string;
+  avatar?: string;
 }
 
-export default function PersonalInfoSection({
-  data,
-  onChange,
-}: PersonalInfoSectionProps) {
-  const handleFieldChange = (field: string, value: string) => {
-    onChange({
-      ...data,
-      [field]: value,
-    });
+interface PersonalInfoSectionProps {
+  data: PersonalInfoData;
+  onChange: (data: PersonalInfoData) => void;
+}
+
+export default function PersonalInfoSection({ data, onChange }: PersonalInfoSectionProps) {
+  const [showAIDialog, setShowAIDialog] = useState(false);
+
+  const updateField = (field: keyof PersonalInfoData, value: string) => {
+    onChange({ ...data, [field]: value });
   };
+
+  const handleAIBioGenerated = (content: string) => {
+    updateField('bio', content);
+  };
+
+  const getBioContext = () => ({
+    fullName: data.fullName,
+    title: data.title,
+    location: data.location,
+    website: data.website,
+    // Add any other relevant context for bio generation
+  });
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
+          <CardTitle>Personal Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="fullName">Full Name</Label>
               <Input
-                id="name"
-                value={data.name || ""}
-                onChange={(e) => handleFieldChange("name", e.target.value)}
-                placeholder="Enter your full name"
+                id="fullName"
+                value={data.fullName || ''}
+                onChange={(e) => updateField('fullName', e.target.value)}
+                placeholder="John Doe"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="title">Professional Title</Label>
               <Input
                 id="title"
-                value={data.title || ""}
-                onChange={(e) => handleFieldChange("title", e.target.value)}
-                placeholder="e.g. Full Stack Developer"
+                value={data.title || ''}
+                onChange={(e) => updateField('title', e.target.value)}
+                placeholder="Full Stack Developer"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                value={data.email || ""}
-                onChange={(e) => handleFieldChange("email", e.target.value)}
-                placeholder="your.email@example.com"
+                value={data.email || ''}
+                onChange={(e) => updateField('email', e.target.value)}
+                placeholder="john@example.com"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Phone</Label>
               <Input
                 id="phone"
-                value={data.phone || ""}
-                onChange={(e) => handleFieldChange("phone", e.target.value)}
+                value={data.phone || ''}
+                onChange={(e) => updateField('phone', e.target.value)}
                 placeholder="+1 (555) 123-4567"
               />
             </div>
-            <div className="space-y-2 md:col-span-2">
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
               <Label htmlFor="location">Location</Label>
               <Input
                 id="location"
-                value={data.location || ""}
-                onChange={(e) => handleFieldChange("location", e.target.value)}
-                placeholder="City, State, Country"
+                value={data.location || ''}
+                onChange={(e) => updateField('location', e.target.value)}
+                placeholder="San Francisco, CA"
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                value={data.website || ''}
+                onChange={(e) => updateField('website', e.target.value)}
+                placeholder="https://johndoe.dev"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="avatar">Avatar URL</Label>
+            <Input
+              id="avatar"
+              value={data.avatar || ''}
+              onChange={(e) => updateField('avatar', e.target.value)}
+              placeholder="https://example.com/avatar.jpg"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="bio">Bio</Label>
+              <div className="flex gap-2">
+                <AIContentButton
+                  contentType="bio"
+                  context={getBioContext()}
+                  onContentGenerated={handleAIBioGenerated}
+                  size="sm"
+                >
+                  Generate Bio
+                </AIContentButton>
+                <AIContentButton
+                  contentType="bio"
+                  context={getBioContext()}
+                  onContentGenerated={() => setShowAIDialog(true)}
+                  variant="ghost"
+                  size="sm"
+                >
+                  Advanced
+                </AIContentButton>
+              </div>
+            </div>
+            <Textarea
+              id="bio"
+              value={data.bio || ''}
+              onChange={(e) => updateField('bio', e.target.value)}
+              placeholder="Tell us about yourself, your passion for development, and what makes you unique..."
+              className="min-h-[100px]"
+            />
           </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Professional Bio</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AIContentGenerator
-            type="bio"
-            context={{
-              name: data.name,
-              title: data.title,
-            }}
-            value={data.bio || ""}
-            onChange={(value) => handleFieldChange("bio", value)}
-            placeholder="Tell your professional story..."
-            label="Bio"
-          />
-        </CardContent>
-      </Card>
+      <AIContentGeneratorDialog
+        open={showAIDialog}
+        onOpenChange={setShowAIDialog}
+        contentType="bio"
+        context={getBioContext()}
+        onAccept={handleAIBioGenerated}
+        initialContent={data.bio}
+      />
     </div>
   );
 }

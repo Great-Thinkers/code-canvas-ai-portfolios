@@ -1,11 +1,14 @@
+
 import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2, Edit3, ExternalLink, Github } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Trash2, X } from "lucide-react";
 import AIContentButton from "../AIContentButton";
+import AIContentGeneratorDialog from "../AIContentGeneratorDialog";
 
 interface Project {
   id: string;
@@ -15,279 +18,221 @@ interface Project {
   liveUrl?: string;
   githubUrl?: string;
   imageUrl?: string;
+  featured?: boolean;
 }
 
 interface ProjectsSectionProps {
-  data: {
-    projects?: Project[];
-  };
-  onChange: (data: any) => void;
+  data: { projects?: Project[] };
+  onChange: (data: { projects: Project[] }) => void;
 }
 
-export default function ProjectsSection({
-  data,
-  onChange,
-}: ProjectsSectionProps) {
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [currentProject, setCurrentProject] = useState<Project>({
-    id: "",
-    name: "",
-    description: "",
-    technologies: [],
-    liveUrl: "",
-    githubUrl: "",
-    imageUrl: "",
-  });
-  const [newTech, setNewTech] = useState("");
+export default function ProjectsSection({ data, onChange }: ProjectsSectionProps) {
+  const [aiDialogProject, setAiDialogProject] = useState<string | null>(null);
+  const projects = data.projects || [];
 
-  const handleAddProject = () => {
-    const newProject = {
-      ...currentProject,
-      id: Date.now().toString(),
-    };
-    const updatedProjects = [...(data.projects || []), newProject];
-    onChange({
-      ...data,
-      projects: updatedProjects,
-    });
-    resetCurrentProject();
-  };
-
-  const handleEditProject = (index: number) => {
-    setEditingIndex(index);
-    setCurrentProject(data.projects![index]);
-  };
-
-  const handleUpdateProject = () => {
-    if (editingIndex !== null) {
-      const updatedProjects = [...(data.projects || [])];
-      updatedProjects[editingIndex] = currentProject;
-      onChange({
-        ...data,
-        projects: updatedProjects,
-      });
-      setEditingIndex(null);
-      resetCurrentProject();
-    }
-  };
-
-  const handleRemoveProject = (index: number) => {
-    const updatedProjects = (data.projects || []).filter((_, i) => i !== index);
-    onChange({
-      ...data,
-      projects: updatedProjects,
-    });
-  };
-
-  const resetCurrentProject = () => {
-    setCurrentProject({
-      id: "",
-      name: "",
-      description: "",
+  const addProject = () => {
+    const newProject: Project = {
+      id: crypto.randomUUID(),
+      name: '',
+      description: '',
       technologies: [],
-      liveUrl: "",
-      githubUrl: "",
-      imageUrl: "",
+    };
+    onChange({ projects: [...projects, newProject] });
+  };
+
+  const removeProject = (id: string) => {
+    onChange({ projects: projects.filter(p => p.id !== id) });
+  };
+
+  const updateProject = (id: string, field: keyof Project, value: any) => {
+    onChange({
+      projects: projects.map(p => 
+        p.id === id ? { ...p, [field]: value } : p
+      )
     });
   };
 
-  const handleAddTechnology = () => {
-    if (newTech.trim()) {
-      setCurrentProject({
-        ...currentProject,
-        technologies: [...currentProject.technologies, newTech.trim()],
-      });
-      setNewTech("");
+  const addTechnology = (projectId: string, tech: string) => {
+    if (!tech.trim()) return;
+    
+    const project = projects.find(p => p.id === projectId);
+    if (project && !project.technologies.includes(tech)) {
+      updateProject(projectId, 'technologies', [...project.technologies, tech]);
     }
   };
 
-  const handleRemoveTechnology = (techToRemove: string) => {
-    setCurrentProject({
-      ...currentProject,
-      technologies: currentProject.technologies.filter(
-        (tech) => tech !== techToRemove
-      ),
-    });
+  const removeTechnology = (projectId: string, tech: string) => {
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      updateProject(projectId, 'technologies', project.technologies.filter(t => t !== tech));
+    }
+  };
+
+  const getProjectContext = (project: Project) => ({
+    name: project.name,
+    technologies: project.technologies,
+    githubUrl: project.githubUrl,
+    liveUrl: project.liveUrl,
+    currentDescription: project.description,
+  });
+
+  const handleAIDescriptionGenerated = (projectId: string, content: string) => {
+    updateProject(projectId, 'description', content);
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Projects</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Existing Projects */}
-        {(data.projects || []).map((project, index) => (
-          <div key={project.id} className="p-4 border rounded-lg">
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <h3 className="font-semibold">{project.name}</h3>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {project.technologies.map((tech, i) => (
-                    <span
-                      key={i}
-                      className="px-2 py-1 bg-muted text-xs rounded"
-                    >
-                      {tech}
-                    </span>
-                  ))}
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Projects</CardTitle>
+            <Button onClick={addProject} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Project
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {projects.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No projects added yet. Click "Add Project" to get started.
+            </div>
+          ) : (
+            projects.map((project, index) => (
+              <div key={project.id} className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium">Project {index + 1}</h4>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeProject(project.id)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Project Name</Label>
+                    <Input
+                      value={project.name}
+                      onChange={(e) => updateProject(project.id, 'name', e.target.value)}
+                      placeholder="My Awesome Project"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Featured Project</Label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={project.featured || false}
+                        onChange={(e) => updateProject(project.id, 'featured', e.target.checked)}
+                        className="rounded"
+                      />
+                      <span className="text-sm">Highlight this project</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Description</Label>
+                    <div className="flex gap-2">
+                      <AIContentButton
+                        contentType="project"
+                        context={getProjectContext(project)}
+                        onContentGenerated={(content) => handleAIDescriptionGenerated(project.id, content)}
+                        size="sm"
+                      >
+                        Generate Description
+                      </AIContentButton>
+                      <AIContentButton
+                        contentType="project"
+                        context={getProjectContext(project)}
+                        onContentGenerated={() => setAiDialogProject(project.id)}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        Advanced
+                      </AIContentButton>
+                    </div>
+                  </div>
+                  <Textarea
+                    value={project.description}
+                    onChange={(e) => updateProject(project.id, 'description', e.target.value)}
+                    placeholder="Describe your project, the technologies used, challenges solved, and its impact..."
+                    className="min-h-[100px]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Live URL</Label>
+                    <Input
+                      value={project.liveUrl || ''}
+                      onChange={(e) => updateProject(project.id, 'liveUrl', e.target.value)}
+                      placeholder="https://myproject.com"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>GitHub URL</Label>
+                    <Input
+                      value={project.githubUrl || ''}
+                      onChange={(e) => updateProject(project.id, 'githubUrl', e.target.value)}
+                      placeholder="https://github.com/username/project"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Project Image URL</Label>
+                  <Input
+                    value={project.imageUrl || ''}
+                    onChange={(e) => updateProject(project.id, 'imageUrl', e.target.value)}
+                    placeholder="https://example.com/project-screenshot.jpg"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Technologies</Label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {project.technologies.map((tech) => (
+                      <Badge key={tech} variant="secondary" className="flex items-center gap-1">
+                        {tech}
+                        <X
+                          className="h-3 w-3 cursor-pointer"
+                          onClick={() => removeTechnology(project.id, tech)}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                  <Input
+                    placeholder="Type a technology and press Enter"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        addTechnology(project.id, e.currentTarget.value);
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                  />
                 </div>
               </div>
-              <div className="flex gap-2">
-                {project.liveUrl && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => window.open(project.liveUrl, "_blank")}
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                )}
-                {project.githubUrl && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => window.open(project.githubUrl, "_blank")}
-                  >
-                    <Github className="h-4 w-4" />
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEditProject(index)}
-                >
-                  <Edit3 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleRemoveProject(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">{project.description}</p>
-          </div>
-        ))}
+            ))
+          )}
+        </CardContent>
+      </Card>
 
-        {/* Add/Edit Project Form */}
-        <div className="p-4 bg-muted/50 rounded-lg space-y-4">
-          <h4 className="font-medium">
-            {editingIndex !== null ? "Edit Project" : "Add New Project"}
-          </h4>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Project Name</Label>
-              <Input
-                value={currentProject.name}
-                onChange={(e) =>
-                  setCurrentProject({
-                    ...currentProject,
-                    name: e.target.value,
-                  })
-                }
-                placeholder="e.g. E-commerce Platform"
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label>Description</Label>
-                <AIContentButton
-                  contentType="project_description"
-                  currentContent={currentProject.description}
-                  onContentGenerated={(content) =>
-                    setCurrentProject({
-                      ...currentProject,
-                      description: content,
-                    })
-                  }
-                  size="sm"
-                />
-              </div>
-              <Textarea
-                value={currentProject.description}
-                onChange={(e) =>
-                  setCurrentProject({
-                    ...currentProject,
-                    description: e.target.value,
-                  })
-                }
-                placeholder="Describe your project..."
-                rows={3}
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Live URL</Label>
-                <Input
-                  value={currentProject.liveUrl}
-                  onChange={(e) =>
-                    setCurrentProject({
-                      ...currentProject,
-                      liveUrl: e.target.value,
-                    })
-                  }
-                  placeholder="https://your-project.com"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>GitHub URL</Label>
-                <Input
-                  value={currentProject.githubUrl}
-                  onChange={(e) =>
-                    setCurrentProject({
-                      ...currentProject,
-                      githubUrl: e.target.value,
-                    })
-                  }
-                  placeholder="https://github.com/username/project"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Technologies Used</Label>
-              <div className="flex gap-2">
-                <Input
-                  value={newTech}
-                  onChange={(e) => setNewTech(e.target.value)}
-                  placeholder="Add technology (e.g. React, Node.js)"
-                  onKeyPress={(e) => e.key === "Enter" && handleAddTechnology()}
-                />
-                <Button onClick={handleAddTechnology} size="sm">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {currentProject.technologies.map((tech, index) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 bg-muted text-xs rounded flex items-center gap-1"
-                  >
-                    {tech}
-                    <button
-                      onClick={() => handleRemoveTechnology(tech)}
-                      className="ml-1 hover:text-destructive"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-          <Button
-            onClick={
-              editingIndex !== null ? handleUpdateProject : handleAddProject
-            }
-            disabled={!currentProject.name || !currentProject.description}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {editingIndex !== null ? "Update Project" : "Add Project"}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      {aiDialogProject && (
+        <AIContentGeneratorDialog
+          open={!!aiDialogProject}
+          onOpenChange={() => setAiDialogProject(null)}
+          contentType="project"
+          context={getProjectContext(projects.find(p => p.id === aiDialogProject)!)}
+          onAccept={(content) => handleAIDescriptionGenerated(aiDialogProject, content)}
+          initialContent={projects.find(p => p.id === aiDialogProject)?.description}
+        />
+      )}
+    </div>
   );
 }

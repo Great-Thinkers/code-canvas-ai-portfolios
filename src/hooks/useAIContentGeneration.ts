@@ -1,68 +1,92 @@
 
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
-export type ContentType = "bio" | "project_description" | "skill_summary" | "experience_summary";
+export type ContentType = 'bio' | 'project' | 'skill' | 'experience' | 'summary';
+export type ContentTone = 'professional' | 'casual' | 'creative';
+export type ContentLength = 'short' | 'medium' | 'long';
 
-export interface GenerateContentOptions {
-  contentType: ContentType;
-  tone: string;
-  currentContent?: string;
-  customPrompt?: string;
+interface GenerateContentOptions {
+  type: ContentType;
+  context: any;
+  tone?: ContentTone;
+  length?: ContentLength;
+}
+
+interface AIGenerationResult {
+  content: string;
+  type: ContentType;
+  success: boolean;
 }
 
 export function useAIContentGeneration() {
-  const { user } = useAuth();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState<string>("");
+  const [lastGenerated, setLastGenerated] = useState<AIGenerationResult | null>(null);
 
   const generateContent = async (options: GenerateContentOptions): Promise<string | null> => {
-    if (!user) {
-      toast.error("User not authenticated");
-      return null;
-    }
-
     setIsGenerating(true);
+    
     try {
-      const { data, error } = await supabase.functions.invoke("generate-portfolio-content", {
-        body: {
-          userId: user.id,
-          ...options,
-        },
+      console.log('Generating AI content:', options);
+
+      const { data, error } = await supabase.functions.invoke('generate-ai-content', {
+        body: options,
       });
 
       if (error) {
-        console.error("Error generating content:", error);
-        toast.error("Failed to generate content");
+        console.error('AI generation error:', error);
+        toast.error('Failed to generate content. Please try again.');
         return null;
       }
 
-      if (data?.content) {
-        setGeneratedContent(data.content);
-        return data.content;
-      } else {
-        toast.error("No content was generated");
+      if (!data.success) {
+        console.error('AI generation failed:', data.error);
+        toast.error(data.error || 'Failed to generate content');
         return null;
       }
+
+      setLastGenerated(data);
+      toast.success('Content generated successfully!');
+      return data.content;
+
     } catch (error) {
-      console.error("Unexpected error:", error);
-      toast.error("An unexpected error occurred");
+      console.error('Unexpected AI generation error:', error);
+      toast.error('An unexpected error occurred while generating content');
       return null;
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const clearGeneratedContent = () => {
-    setGeneratedContent("");
+  const generateBio = async (context: any, tone: ContentTone = 'professional', length: ContentLength = 'medium') => {
+    return generateContent({ type: 'bio', context, tone, length });
+  };
+
+  const generateProjectDescription = async (context: any, tone: ContentTone = 'professional', length: ContentLength = 'medium') => {
+    return generateContent({ type: 'project', context, tone, length });
+  };
+
+  const generateSkillDescription = async (skill: string, tone: ContentTone = 'professional') => {
+    return generateContent({ type: 'skill', context: { skill }, tone, length: 'short' });
+  };
+
+  const generateExperienceSummary = async (context: any, tone: ContentTone = 'professional', length: ContentLength = 'medium') => {
+    return generateContent({ type: 'experience', context, tone, length });
+  };
+
+  const generateProfessionalSummary = async (context: any, tone: ContentTone = 'professional', length: ContentLength = 'medium') => {
+    return generateContent({ type: 'summary', context, tone, length });
   };
 
   return {
-    generateContent,
-    generatedContent,
     isGenerating,
-    clearGeneratedContent,
+    lastGenerated,
+    generateContent,
+    generateBio,
+    generateProjectDescription,
+    generateSkillDescription,
+    generateExperienceSummary,
+    generateProfessionalSummary,
   };
 }
