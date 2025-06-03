@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 export type ExportType = 'zip' | 'github-pages' | 'netlify';
@@ -13,21 +14,28 @@ interface ExportStatus {
 }
 
 export function usePortfolioExport() {
+  const { user } = useAuth();
   const [isExporting, setIsExporting] = useState(false);
   const [exportStatus, setExportStatus] = useState<ExportStatus | null>(null);
 
   const startExport = async (portfolioId: string, exportType: ExportType = 'zip') => {
+    if (!user) {
+      toast.error('User not authenticated');
+      return;
+    }
+
     setIsExporting(true);
     setExportStatus(null);
 
     try {
-      // Create export record
+      // Create export record with user_id
       const { data: exportRecord, error: createError } = await supabase
         .from('portfolio_exports')
         .insert({
           portfolio_id: portfolioId,
           export_type: exportType,
           status: 'pending',
+          user_id: user.id,
         })
         .select('id')
         .single();

@@ -11,9 +11,11 @@ interface Portfolio {
   id: string;
   name: string;
   template_name: string;
+  template_id: number;
   updated_at: string;
   is_published: boolean;
   portfolio_data: any;
+  created_at: string;
 }
 
 export default function PortfoliosTab() {
@@ -32,6 +34,7 @@ export default function PortfoliosTab() {
       const { data, error } = await supabase
         .from("portfolios")
         .select("*")
+        .eq("user_id", user?.id)
         .order("updated_at", { ascending: false });
 
       if (error) {
@@ -49,21 +52,8 @@ export default function PortfoliosTab() {
     }
   };
 
-  const formatLastUpdated = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) return "Just now";
-    if (diffInHours < 24) return `${diffInHours} hours ago`;
-    
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays} days ago`;
-    
-    const diffInWeeks = Math.floor(diffInDays / 7);
-    if (diffInWeeks < 4) return `${diffInWeeks} weeks ago`;
-    
-    return date.toLocaleDateString();
+  const handleDeletePortfolio = (portfolioId: string) => {
+    setPortfolios(portfolios.filter(p => p.id !== portfolioId));
   };
 
   if (loading) {
@@ -92,12 +82,8 @@ export default function PortfoliosTab() {
           {portfolios.map((portfolio) => (
             <PortfolioCard
               key={portfolio.id}
-              id={portfolio.id}
-              name={portfolio.name}
-              template={portfolio.template_name}
-              lastUpdated={formatLastUpdated(portfolio.updated_at)}
-              isPublished={portfolio.is_published}
-              previewUrl="/placeholder.svg"
+              portfolio={portfolio}
+              onDelete={handleDeletePortfolio}
             />
           ))}
         </div>

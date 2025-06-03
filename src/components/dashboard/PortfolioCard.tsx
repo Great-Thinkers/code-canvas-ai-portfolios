@@ -21,6 +21,7 @@ import {
   Copy 
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import PortfolioExportDialog from "@/components/portfolio/PortfolioExportDialog";
 
@@ -28,9 +29,11 @@ interface Portfolio {
   id: string;
   name: string;
   template_name: string;
+  template_id: number;
   is_published: boolean;
   created_at: string;
   updated_at: string;
+  portfolio_data: any;
 }
 
 interface PortfolioCardProps {
@@ -39,6 +42,7 @@ interface PortfolioCardProps {
 }
 
 export default function PortfolioCard({ portfolio, onDelete }: PortfolioCardProps) {
+  const { user } = useAuth();
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -67,6 +71,8 @@ export default function PortfolioCard({ portfolio, onDelete }: PortfolioCardProp
   };
 
   const handleDuplicate = async () => {
+    if (!user) return;
+    
     try {
       // Fetch the original portfolio data
       const { data: originalData, error: fetchError } = await supabase
@@ -79,13 +85,15 @@ export default function PortfolioCard({ portfolio, onDelete }: PortfolioCardProp
         throw new Error("Failed to fetch portfolio data");
       }
 
-      // Create a duplicate
+      // Create a duplicate with all required fields
       const { error: createError } = await supabase
         .from("portfolios")
         .insert({
           name: `${originalData.name} (Copy)`,
           template_name: originalData.template_name,
+          template_id: originalData.template_id,
           portfolio_data: originalData.portfolio_data,
+          user_id: user.id,
           is_published: false,
         });
 
