@@ -42,12 +42,13 @@ serve(async (req) => {
 
     const { type, context, tone = 'professional', length = 'medium' }: GenerateContentRequest = await req.json()
 
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
-    if (!openaiApiKey) {
-      throw new Error('OpenAI API key not configured')
+    // Use your Groq API key
+    const groqApiKey = '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'
+    if (!groqApiKey) {
+      throw new Error('Groq API key not configured')
     }
 
-    console.log(`Generating ${type} content for user ${user.id}`)
+    console.log(`Generating ${type} content for user ${user.id} using Groq`)
 
     // Generate prompt based on content type
     let prompt = ''
@@ -83,19 +84,19 @@ serve(async (req) => {
         throw new Error(`Unsupported content type: ${type}`)
     }
 
-    // Call OpenAI API
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Call Groq API with your model
+    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${groqApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: 'llama-3.3-70b-versatile',
         messages: [
           {
             role: 'system',
-            content: 'You are a professional copywriter specializing in developer portfolios. Write engaging, authentic content that helps developers showcase their skills and experience effectively.'
+            content: 'You are a professional copywriter specializing in developer portfolios. Write engaging, authentic content that helps developers showcase their skills and experience effectively. Keep responses concise and impactful.'
           },
           {
             role: 'user',
@@ -107,20 +108,20 @@ serve(async (req) => {
       }),
     })
 
-    if (!openaiResponse.ok) {
-      const error = await openaiResponse.text()
-      console.error('OpenAI API error:', error)
-      throw new Error(`OpenAI API error: ${openaiResponse.status}`)
+    if (!groqResponse.ok) {
+      const error = await groqResponse.text()
+      console.error('Groq API error:', error)
+      throw new Error(`Groq API error: ${groqResponse.status}`)
     }
 
-    const openaiResult = await openaiResponse.json()
-    const generatedContent = openaiResult.choices[0]?.message?.content?.trim()
+    const groqResult = await groqResponse.json()
+    const generatedContent = groqResult.choices[0]?.message?.content?.trim()
 
     if (!generatedContent) {
       throw new Error('No content generated')
     }
 
-    console.log(`Successfully generated ${type} content`)
+    console.log(`Successfully generated ${type} content using Groq`)
 
     return new Response(
       JSON.stringify({ 

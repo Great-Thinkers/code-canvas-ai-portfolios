@@ -37,7 +37,8 @@ export default function AIContentGenerator({
   const handleGenerate = async () => {
     try {
       const content = await generateContent({ 
-        contentType: type, 
+        type: type === 'project_description' ? 'project' : type === 'skill_summary' ? 'skill' : type === 'experience_summary' ? 'experience' : type,
+        context,
         tone: 'professional'
       });
       if (content) {
@@ -52,9 +53,21 @@ export default function AIContentGenerator({
   const handleGenerateVariations = async () => {
     try {
       const variations = await Promise.all([
-        generateContent({ contentType: type, tone: 'professional' }),
-        generateContent({ contentType: type, tone: 'casual' }),
-        generateContent({ contentType: type, tone: 'creative' }),
+        generateContent({ 
+          type: type === 'project_description' ? 'project' : type === 'skill_summary' ? 'skill' : type === 'experience_summary' ? 'experience' : type,
+          context,
+          tone: 'professional' 
+        }),
+        generateContent({ 
+          type: type === 'project_description' ? 'project' : type === 'skill_summary' ? 'skill' : type === 'experience_summary' ? 'experience' : type,
+          context,
+          tone: 'casual' 
+        }),
+        generateContent({ 
+          type: type === 'project_description' ? 'project' : type === 'skill_summary' ? 'skill' : type === 'experience_summary' ? 'experience' : type,
+          context,
+          tone: 'creative' 
+        }),
       ]);
       const validVariations = variations.filter(Boolean) as string[];
       setSuggestions(validVariations);
