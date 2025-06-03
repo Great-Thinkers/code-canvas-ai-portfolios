@@ -90,7 +90,7 @@ export default function ModernMinimalTemplate({
               return (
                 <a
                   key={platform}
-                  href={url}
+                  href={String(url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3 rounded-full transition-colors hover:scale-110"

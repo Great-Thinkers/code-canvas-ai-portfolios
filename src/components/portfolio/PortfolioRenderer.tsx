@@ -52,13 +52,15 @@ export default function PortfolioRenderer({
   return (
     <div 
       className={className}
-      style={templateStyles.cssVariables}
+      style={templateStyles.cssVariables as React.CSSProperties}
     >
       <TemplateComponent
         portfolioData={portfolioData}
         template={templateStyles.template}
         customization={customization}
-      />
+      >
+        <div />
+      </TemplateComponent>
     </div>
   );
 }
