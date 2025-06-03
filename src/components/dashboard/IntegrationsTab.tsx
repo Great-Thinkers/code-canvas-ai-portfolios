@@ -41,6 +41,39 @@ export default function IntegrationsTab() {
     }
   };
 
+  const handleSyncLinkedIn = async () => {
+    try {
+      await syncLinkedIn();
+      toast({
+        title: "LinkedIn Sync Initiated",
+        description:
+          "Timestamp updated. Note: Full LinkedIn data sync requires special API permissions not yet enabled for this application.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "LinkedIn sync failed",
+        description: "There was an error attempting to sync with LinkedIn.",
+      });
+    }
+  };
+
+  const handleSyncGitHub = async () => {
+    try {
+      await syncGitHub();
+      toast({
+        title: "GitHub data sync started",
+        description: "Your GitHub data is being updated in the background.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "GitHub sync failed",
+        description: "There was an error syncing your GitHub data.",
+      });
+    }
+  };
+
   const handleDisconnectGithub = async () => {
     try {
       await disconnectGitHub();
@@ -114,6 +147,7 @@ export default function IntegrationsTab() {
           isConnected={githubConnected}
           onConnect={handleConnectGithub}
           onDisconnect={handleDisconnectGithub}
+          onSyncData={handleSyncGitHub}
           loading={githubLoading}
           lastSynced={githubProfile?.last_synced_at}
           profileData={githubProfile}
@@ -141,6 +175,7 @@ export default function IntegrationsTab() {
           isConnected={linkedinConnected}
           onConnect={handleConnectLinkedin}
           onDisconnect={handleDisconnectLinkedin}
+          onSyncData={handleSyncLinkedIn}
           loading={linkedinLoading}
           lastSynced={linkedinProfile?.last_synced_at}
           profileData={linkedinProfile}
