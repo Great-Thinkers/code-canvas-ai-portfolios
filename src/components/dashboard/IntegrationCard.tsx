@@ -17,6 +17,7 @@ type IntegrationCardProps = {
   isConnected: boolean;
   onConnect: () => void;
   onDisconnect: () => void;
+  onSyncData?: () => Promise<void>;
   loading?: boolean;
   lastSynced?: string | null;
   profileData?: any;
@@ -29,6 +30,7 @@ export default function IntegrationCard({
   isConnected,
   onConnect,
   onDisconnect,
+  onSyncData,
   loading = false,
   lastSynced,
   profileData,
@@ -136,9 +138,7 @@ export default function IntegrationCard({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => {
-                  /* TODO: Implement sync */
-                }}
+                onClick={onSyncData}
                 disabled={loading}
                 title="Sync data"
               >
