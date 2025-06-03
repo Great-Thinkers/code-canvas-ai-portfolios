@@ -1,7 +1,8 @@
 
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -10,104 +11,168 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sparkles } from "lucide-react";
+import { 
+  Eye, 
+  Edit, 
+  Download, 
+  Share, 
+  MoreVertical, 
+  Trash2, 
+  Copy 
+} from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import PortfolioExportDialog from "@/components/portfolio/PortfolioExportDialog";
 
-type PortfolioCardProps = {
+interface Portfolio {
   id: string;
   name: string;
-  template: string;
-  lastUpdated: string;
-  isPublished: boolean;
-  previewUrl: string;
-};
+  template_name: string;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
-export default function PortfolioCard({
-  id,
-  name,
-  template,
-  lastUpdated,
-  isPublished,
-  previewUrl,
-}: PortfolioCardProps) {
+interface PortfolioCardProps {
+  portfolio: Portfolio;
+  onDelete: (id: string) => void;
+}
+
+export default function PortfolioCard({ portfolio, onDelete }: PortfolioCardProps) {
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("portfolios")
+        .delete()
+        .eq("id", portfolio.id);
+
+      if (error) {
+        console.error("Error deleting portfolio:", error);
+        toast.error("Failed to delete portfolio");
+        return;
+      }
+
+      toast.success("Portfolio deleted successfully");
+      onDelete(portfolio.id);
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDuplicate = async () => {
+    try {
+      // Fetch the original portfolio data
+      const { data: originalData, error: fetchError } = await supabase
+        .from("portfolios")
+        .select("*")
+        .eq("id", portfolio.id)
+        .single();
+
+      if (fetchError) {
+        throw new Error("Failed to fetch portfolio data");
+      }
+
+      // Create a duplicate
+      const { error: createError } = await supabase
+        .from("portfolios")
+        .insert({
+          name: `${originalData.name} (Copy)`,
+          template_name: originalData.template_name,
+          portfolio_data: originalData.portfolio_data,
+          is_published: false,
+        });
+
+      if (createError) {
+        throw new Error("Failed to create duplicate");
+      }
+
+      toast.success("Portfolio duplicated successfully");
+      // You might want to refresh the portfolio list here
+      window.location.reload();
+    } catch (error) {
+      console.error("Duplicate error:", error);
+      toast.error("Failed to duplicate portfolio");
+    }
+  };
+
   return (
-    <Card className="overflow-hidden border-border/60 bg-card/50 flex flex-col">
-      <div className="aspect-[16/9] relative overflow-hidden">
-        <img
-          src={previewUrl}
-          alt={name}
-          className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
-        />
-        <div className="absolute top-3 right-3">
-          <Badge variant={isPublished ? "default" : "secondary"}>
-            {isPublished ? "Published" : "Draft"}
-          </Badge>
-        </div>
-        <div className="absolute top-3 left-3">
-          <Badge variant="outline" className="bg-background/80 backdrop-blur-sm">
-            <Sparkles className="h-3 w-3 mr-1" />
-            AI Ready
-          </Badge>
-        </div>
-      </div>
-      <CardContent className="p-5 flex-grow">
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="font-semibold text-lg mb-1">{name}</h3>
-            <p className="text-sm text-muted-foreground mb-2">
-              Template: {template}
-            </p>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="-mr-2 h-8 w-8">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-4 w-4"
+    <>
+      <Card className="hover:shadow-md transition-shadow">
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div>
+              <CardTitle className="text-lg">{portfolio.name}</CardTitle>
+              <div className="flex items-center gap-2 mt-2">
+                <Badge variant="outline">{portfolio.template_name}</Badge>
+                {portfolio.is_published && (
+                  <Badge className="bg-green-100 text-green-800">Published</Badge>
+                )}
+              </div>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleDuplicate}>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowExportDialog(true)}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="text-destructive"
                 >
-                  <circle cx="12" cy="12" r="1"></circle>
-                  <circle cx="12" cy="5" r="1"></circle>
-                  <circle cx="12" cy="19" r="1"></circle>
-                </svg>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Link to={`/dashboard/edit/${id}`} className="w-full flex">
-                  Edit
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Sparkles className="h-4 w-4 mr-2" />
-                Generate AI Content
-              </DropdownMenuItem>
-              <DropdownMenuItem>Duplicate</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-500">
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Last updated: {lastUpdated}
-        </p>
-      </CardContent>
-      <CardFooter className="px-5 py-4 border-t border-border/40 flex justify-between">
-        <Link to={`/dashboard/edit/${id}`}>
-          <Button variant="ghost" size="sm">
-            Edit
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Last updated: {new Date(portfolio.updated_at).toLocaleDateString()}
+          </p>
+        </CardContent>
+
+        <CardFooter className="flex gap-2">
+          <Button asChild variant="outline" size="sm" className="flex-1">
+            <Link to={`/dashboard/preview/${portfolio.id}`}>
+              <Eye className="h-4 w-4 mr-2" />
+              Preview
+            </Link>
           </Button>
-        </Link>
-        <Link to={`/dashboard/preview/${id}`}>
-          <Button size="sm">View</Button>
-        </Link>
-      </CardFooter>
-    </Card>
+          <Button asChild size="sm" className="flex-1">
+            <Link to={`/dashboard/edit/${portfolio.id}`}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Link>
+          </Button>
+        </CardFooter>
+      </Card>
+
+      <PortfolioExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        portfolioId={portfolio.id}
+        portfolioName={portfolio.name}
+      />
+    </>
   );
 }

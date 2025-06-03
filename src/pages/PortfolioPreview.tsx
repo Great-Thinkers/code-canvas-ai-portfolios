@@ -11,6 +11,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import PortfolioRenderer from "@/components/portfolio/PortfolioRenderer";
+import PortfolioExportDialog from "@/components/portfolio/PortfolioExportDialog";
 
 interface Portfolio {
   id: string;
@@ -26,6 +27,7 @@ function PortfolioPreviewContent() {
   const { user } = useAuth();
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showExportDialog, setShowExportDialog] = useState(false);
 
   useEffect(() => {
     if (id && user) {
@@ -130,7 +132,10 @@ function PortfolioPreviewContent() {
                 <Share className="h-4 w-4 mr-2" />
                 Share
               </Button>
-              <Button variant="outline" disabled>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowExportDialog(true)}
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
@@ -147,6 +152,14 @@ function PortfolioPreviewContent() {
           portfolioData={portfolio.portfolio_data}
         />
       </main>
+
+      {/* Export Dialog */}
+      <PortfolioExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        portfolioId={portfolio.id}
+        portfolioName={portfolio.name}
+      />
     </div>
   );
 }

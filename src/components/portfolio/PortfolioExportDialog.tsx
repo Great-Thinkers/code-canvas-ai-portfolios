@@ -1,198 +1,258 @@
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Download, Github, Globe, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
-
-interface Portfolio {
-  id: string;
-  name: string;
-  template_name: string;
-  portfolio_data: any;
-}
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { 
+  Download, 
+  Github, 
+  Globe, 
+  Loader2, 
+  CheckCircle, 
+  XCircle,
+  FileArchive,
+  ExternalLink 
+} from 'lucide-react';
+import { usePortfolioExport, ExportType } from '@/hooks/usePortfolioExport';
 
 interface PortfolioExportDialogProps {
-  portfolio: Portfolio;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onExportComplete: () => void;
+  portfolioId: string;
+  portfolioName: string;
 }
 
 const exportOptions = [
   {
-    id: "zip",
-    title: "Download as ZIP",
-    description: "Download your portfolio as a static HTML/CSS/JS bundle",
-    icon: Download,
-    premium: false,
+    type: 'zip' as ExportType,
+    title: 'Download ZIP',
+    description: 'Download your portfolio as a ZIP file with HTML, CSS, and assets',
+    icon: FileArchive,
+    isPremium: false,
+    features: ['Static HTML/CSS files', 'Offline viewing', 'Easy hosting'],
   },
   {
-    id: "github-pages",
-    title: "Deploy to GitHub Pages",
-    description: "Automatically deploy to GitHub Pages with custom domain support",
+    type: 'github-pages' as ExportType,
+    title: 'GitHub Pages',
+    description: 'Deploy directly to GitHub Pages for free hosting',
     icon: Github,
-    premium: true,
+    isPremium: true,
+    features: ['Automatic deployment', 'Custom domain support', 'GitHub integration'],
   },
   {
-    id: "netlify",
-    title: "Deploy to Netlify",
-    description: "One-click deployment to Netlify with continuous deployment",
+    type: 'netlify' as ExportType,
+    title: 'Netlify Deploy',
+    description: 'Deploy to Netlify with continuous deployment',
     icon: Globe,
-    premium: true,
+    isPremium: true,
+    features: ['CDN hosting', 'Form handling', 'Analytics'],
   },
 ];
 
 export default function PortfolioExportDialog({
-  portfolio,
   open,
   onOpenChange,
-  onExportComplete,
+  portfolioId,
+  portfolioName,
 }: PortfolioExportDialogProps) {
-  const { user } = useAuth();
-  const [selectedOption, setSelectedOption] = useState("zip");
-  const [isExporting, setIsExporting] = useState(false);
+  const [selectedExportType, setSelectedExportType] = useState<ExportType>('zip');
+  const { isExporting, exportStatus, startExport, downloadExport } = usePortfolioExport();
 
   const handleExport = async () => {
-    if (!user) return;
+    await startExport(portfolioId, selectedExportType);
+  };
 
-    setIsExporting(true);
-    try {
-      // Create export record
-      const { data: exportRecord, error: insertError } = await supabase
-        .from("portfolio_exports")
-        .insert({
-          portfolio_id: portfolio.id,
-          user_id: user.id,
-          export_type: selectedOption,
-          status: "pending",
-        })
-        .select()
-        .single();
+  const handleDownload = () => {
+    if (exportStatus?.downloadUrl) {
+      downloadExport(exportStatus.downloadUrl, portfolioName);
+    }
+  };
 
-      if (insertError) {
-        console.error("Error creating export record:", insertError);
-        toast.error("Failed to start export process");
-        return;
-      }
+  const getStatusIcon = () => {
+    if (!exportStatus) return null;
+    
+    switch (exportStatus.status) {
+      case 'pending':
+      case 'processing':
+        return <Loader2 className="h-5 w-5 animate-spin text-blue-500" />;
+      case 'completed':
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case 'failed':
+        return <XCircle className="h-5 w-5 text-red-500" />;
+      default:
+        return null;
+    }
+  };
 
-      // Call the export edge function
-      const { data, error } = await supabase.functions.invoke("export-portfolio", {
-        body: {
-          exportId: exportRecord.id,
-          portfolioId: portfolio.id,
-          exportType: selectedOption,
-        },
-      });
+  const getStatusText = () => {
+    if (!exportStatus) return '';
+    
+    switch (exportStatus.status) {
+      case 'pending':
+        return 'Preparing export...';
+      case 'processing':
+        return 'Generating portfolio files...';
+      case 'completed':
+        return 'Export completed successfully!';
+      case 'failed':
+        return `Export failed: ${exportStatus.errorMessage || 'Unknown error'}`;
+      default:
+        return '';
+    }
+  };
 
-      if (error) {
-        console.error("Error calling export function:", error);
-        toast.error("Failed to export portfolio");
-        return;
-      }
-
-      toast.success("Export started! You'll be notified when it's ready.");
-      onExportComplete();
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Unexpected error:", error);
-      toast.error("An unexpected error occurred");
-    } finally {
-      setIsExporting(false);
+  const getProgressValue = () => {
+    if (!exportStatus) return 0;
+    
+    switch (exportStatus.status) {
+      case 'pending':
+        return 25;
+      case 'processing':
+        return 75;
+      case 'completed':
+        return 100;
+      case 'failed':
+        return 0;
+      default:
+        return 0;
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Export Portfolio</DialogTitle>
           <DialogDescription>
-            Choose how you'd like to export "{portfolio.name}"
+            Choose how you'd like to export "{portfolioName}"
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
-          <RadioGroup
-            value={selectedOption}
-            onValueChange={setSelectedOption}
-            className="space-y-4"
-          >
-            {exportOptions.map((option) => {
-              const Icon = option.icon;
-              return (
-                <div
-                  key={option.id}
-                  className={`relative flex items-start space-x-3 rounded-lg border p-4 transition-colors ${
-                    selectedOption === option.id
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:bg-muted/50"
-                  } ${option.premium ? "opacity-60" : ""}`}
-                >
-                  <RadioGroupItem
-                    value={option.id}
-                    id={option.id}
-                    disabled={option.premium}
-                    className="mt-1"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <Label
-                      htmlFor={option.id}
-                      className="flex items-center gap-2 font-medium cursor-pointer"
-                    >
-                      <Icon className="h-4 w-4" />
-                      {option.title}
-                      {option.premium && (
-                        <Badge className="bg-brand-500 text-white hover:bg-brand-600">
-                          Premium
-                        </Badge>
+          {/* Export Options */}
+          {!isExporting && !exportStatus && (
+            <div className="grid grid-cols-1 gap-4">
+              {exportOptions.map((option) => {
+                const IconComponent = option.icon;
+                const isSelected = selectedExportType === option.type;
+                
+                return (
+                  <Card
+                    key={option.type}
+                    className={`cursor-pointer transition-colors ${
+                      isSelected
+                        ? 'ring-2 ring-primary border-primary'
+                        : 'hover:border-primary/50'
+                    } ${option.isPremium ? 'opacity-75' : ''}`}
+                    onClick={() => !option.isPremium && setSelectedExportType(option.type)}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <IconComponent className="h-5 w-5" />
+                          <CardTitle className="text-base">{option.title}</CardTitle>
+                        </div>
+                        <div className="flex gap-2">
+                          {option.isPremium && (
+                            <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                              Premium
+                            </Badge>
+                          )}
+                          {isSelected && !option.isPremium && (
+                            <Badge variant="default">Selected</Badge>
+                          )}
+                        </div>
+                      </div>
+                      <CardDescription>{option.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        {option.features.map((feature, index) => (
+                          <li key={index} className="flex items-center gap-2">
+                            <CheckCircle className="h-3 w-3 text-green-500" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                      {option.isPremium && (
+                        <p className="text-xs text-muted-foreground mt-2 italic">
+                          Available with Pro subscription
+                        </p>
                       )}
-                    </Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {option.description}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </RadioGroup>
-
-          <Separator />
-
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-muted-foreground">
-              {exportOptions.find((opt) => opt.id === selectedOption)?.premium && (
-                <p>Premium features require an upgraded plan.</p>
-              )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
-            <div className="flex gap-2">
+          )}
+
+          {/* Export Progress */}
+          {(isExporting || exportStatus) && (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    {getStatusIcon()}
+                    <span className="font-medium">{getStatusText()}</span>
+                  </div>
+                  
+                  {exportStatus?.status !== 'failed' && (
+                    <Progress value={getProgressValue()} className="h-2" />
+                  )}
+
+                  {exportStatus?.status === 'completed' && exportStatus.downloadUrl && (
+                    <div className="flex gap-2 pt-4">
+                      <Button onClick={handleDownload} className="flex-1">
+                        <Download className="h-4 w-4 mr-2" />
+                        Download Portfolio
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => window.open(exportStatus.downloadUrl, '_blank')}
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+
+                  {exportStatus?.status === 'failed' && (
+                    <div className="flex gap-2 pt-4">
+                      <Button onClick={handleExport} variant="outline" className="flex-1">
+                        Try Again
+                      </Button>
+                      <Button variant="outline" onClick={() => onOpenChange(false)}>
+                        Close
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Action Buttons */}
+          {!isExporting && !exportStatus && (
+            <div className="flex justify-end gap-3">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button
+              <Button 
                 onClick={handleExport}
-                disabled={
-                  isExporting ||
-                  exportOptions.find((opt) => opt.id === selectedOption)?.premium
-                }
+                disabled={exportOptions.find(opt => opt.type === selectedExportType)?.isPremium}
               >
-                {isExporting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                {isExporting ? "Exporting..." : "Export Portfolio"}
+                <Download className="h-4 w-4 mr-2" />
+                Start Export
               </Button>
             </div>
-          </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
