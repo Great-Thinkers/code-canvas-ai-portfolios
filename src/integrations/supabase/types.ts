@@ -9,6 +9,112 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      github_commits: {
+        Row: {
+          additions: number | null
+          author_date: string | null
+          author_email: string | null
+          author_name: string | null
+          committer_date: string | null
+          committer_email: string | null
+          committer_name: string | null
+          created_at: string
+          deletions: number | null
+          files_changed: number | null
+          github_profile_id: string
+          id: string
+          message: string | null
+          repo_id: number
+          sha: string
+          total_changes: number | null
+          updated_at: string
+        }
+        Insert: {
+          additions?: number | null
+          author_date?: string | null
+          author_email?: string | null
+          author_name?: string | null
+          committer_date?: string | null
+          committer_email?: string | null
+          committer_name?: string | null
+          created_at?: string
+          deletions?: number | null
+          files_changed?: number | null
+          github_profile_id: string
+          id?: string
+          message?: string | null
+          repo_id: number
+          sha: string
+          total_changes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          additions?: number | null
+          author_date?: string | null
+          author_email?: string | null
+          author_name?: string | null
+          committer_date?: string | null
+          committer_email?: string | null
+          committer_name?: string | null
+          created_at?: string
+          deletions?: number | null
+          files_changed?: number | null
+          github_profile_id?: string
+          id?: string
+          message?: string | null
+          repo_id?: number
+          sha?: string
+          total_changes?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "github_commits_github_profile_id_fkey"
+            columns: ["github_profile_id"]
+            isOneToOne: false
+            referencedRelation: "github_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      github_contributions: {
+        Row: {
+          contribution_count: number
+          contribution_level: number
+          created_at: string
+          date: string
+          github_profile_id: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          contribution_count?: number
+          contribution_level?: number
+          created_at?: string
+          date: string
+          github_profile_id: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          contribution_count?: number
+          contribution_level?: number
+          created_at?: string
+          date?: string
+          github_profile_id?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "github_contributions_github_profile_id_fkey"
+            columns: ["github_profile_id"]
+            isOneToOne: false
+            referencedRelation: "github_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       github_profiles: {
         Row: {
           access_token: string | null
@@ -75,65 +181,151 @@ export type Database = {
         }
         Relationships: []
       }
+      github_project_suggestions: {
+        Row: {
+          auto_generated_description: string | null
+          confidence_score: number | null
+          created_at: string
+          github_profile_id: string
+          id: string
+          is_featured_candidate: boolean | null
+          project_category: string | null
+          repo_id: number
+          suggested_description: string | null
+          suggested_name: string
+          suggested_technologies: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          auto_generated_description?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          github_profile_id: string
+          id?: string
+          is_featured_candidate?: boolean | null
+          project_category?: string | null
+          repo_id: number
+          suggested_description?: string | null
+          suggested_name: string
+          suggested_technologies?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          auto_generated_description?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          github_profile_id?: string
+          id?: string
+          is_featured_candidate?: boolean | null
+          project_category?: string | null
+          repo_id?: number
+          suggested_description?: string | null
+          suggested_name?: string
+          suggested_technologies?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "github_project_suggestions_github_profile_id_fkey"
+            columns: ["github_profile_id"]
+            isOneToOne: false
+            referencedRelation: "github_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       github_repositories: {
         Row: {
+          commit_count: number | null
+          contributor_count: number | null
           created_at: string
           created_at_github: string | null
+          default_branch: string | null
           description: string | null
           forks_count: number | null
           full_name: string
           github_profile_id: string
+          has_pages: boolean | null
+          has_wiki: boolean | null
           html_url: string
           id: string
+          is_archived: boolean | null
           is_fork: boolean | null
           is_private: boolean | null
+          is_template: boolean | null
           language: string | null
           languages_data: Json | null
+          last_commit_at: string | null
           name: string
+          open_issues_count: number | null
+          primary_language_percentage: number | null
           pushed_at_github: string | null
           repo_id: number
+          size_kb: number | null
           stargazers_count: number | null
           topics: string[] | null
           updated_at: string
           updated_at_github: string | null
         }
         Insert: {
+          commit_count?: number | null
+          contributor_count?: number | null
           created_at?: string
           created_at_github?: string | null
+          default_branch?: string | null
           description?: string | null
           forks_count?: number | null
           full_name: string
           github_profile_id: string
+          has_pages?: boolean | null
+          has_wiki?: boolean | null
           html_url: string
           id?: string
+          is_archived?: boolean | null
           is_fork?: boolean | null
           is_private?: boolean | null
+          is_template?: boolean | null
           language?: string | null
           languages_data?: Json | null
+          last_commit_at?: string | null
           name: string
+          open_issues_count?: number | null
+          primary_language_percentage?: number | null
           pushed_at_github?: string | null
           repo_id: number
+          size_kb?: number | null
           stargazers_count?: number | null
           topics?: string[] | null
           updated_at?: string
           updated_at_github?: string | null
         }
         Update: {
+          commit_count?: number | null
+          contributor_count?: number | null
           created_at?: string
           created_at_github?: string | null
+          default_branch?: string | null
           description?: string | null
           forks_count?: number | null
           full_name?: string
           github_profile_id?: string
+          has_pages?: boolean | null
+          has_wiki?: boolean | null
           html_url?: string
           id?: string
+          is_archived?: boolean | null
           is_fork?: boolean | null
           is_private?: boolean | null
+          is_template?: boolean | null
           language?: string | null
           languages_data?: Json | null
+          last_commit_at?: string | null
           name?: string
+          open_issues_count?: number | null
+          primary_language_percentage?: number | null
           pushed_at_github?: string | null
           repo_id?: number
+          size_kb?: number | null
           stargazers_count?: number | null
           topics?: string[] | null
           updated_at?: string
@@ -144,6 +336,56 @@ export type Database = {
             foreignKeyName: "github_repositories_github_profile_id_fkey"
             columns: ["github_profile_id"]
             isOneToOne: false
+            referencedRelation: "github_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      github_sync_settings: {
+        Row: {
+          auto_sync_enabled: boolean
+          created_at: string
+          github_profile_id: string
+          id: string
+          last_auto_sync_at: string | null
+          max_commits_per_repo: number
+          sync_commits: boolean
+          sync_contributions: boolean
+          sync_frequency_hours: number
+          sync_repositories: boolean
+          updated_at: string
+        }
+        Insert: {
+          auto_sync_enabled?: boolean
+          created_at?: string
+          github_profile_id: string
+          id?: string
+          last_auto_sync_at?: string | null
+          max_commits_per_repo?: number
+          sync_commits?: boolean
+          sync_contributions?: boolean
+          sync_frequency_hours?: number
+          sync_repositories?: boolean
+          updated_at?: string
+        }
+        Update: {
+          auto_sync_enabled?: boolean
+          created_at?: string
+          github_profile_id?: string
+          id?: string
+          last_auto_sync_at?: string | null
+          max_commits_per_repo?: number
+          sync_commits?: boolean
+          sync_contributions?: boolean
+          sync_frequency_hours?: number
+          sync_repositories?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "github_sync_settings_github_profile_id_fkey"
+            columns: ["github_profile_id"]
+            isOneToOne: true
             referencedRelation: "github_profiles"
             referencedColumns: ["id"]
           },
