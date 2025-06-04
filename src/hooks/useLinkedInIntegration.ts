@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -58,11 +59,11 @@ export const useLinkedInIntegration = () => {
   const connectLinkedIn = async () => {
     setLoading(true);
     try {
-      // Initiate LinkedIn OAuth flow
+      // Initiate LinkedIn OAuth flow with proper redirect
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "linkedin_oidc",
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}/auth/callback`,
           scopes: "openid profile email",
         },
       });

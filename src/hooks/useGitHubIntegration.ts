@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -60,11 +61,11 @@ export const useGitHubIntegration = () => {
   const connectGitHub = async () => {
     setLoading(true);
     try {
-      // Initiate GitHub OAuth flow
+      // Initiate GitHub OAuth flow with proper redirect
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "github",
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}/auth/callback`,
           scopes: "user:email read:user repo",
         },
       });

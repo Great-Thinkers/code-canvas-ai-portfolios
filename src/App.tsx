@@ -18,6 +18,7 @@ import CreatePortfolio from "./pages/CreatePortfolio";
 import NotFound from "./pages/NotFound";
 import PortfolioPreview from "./pages/PortfolioPreview";
 import PortfolioEditor from "./pages/PortfolioEditor";
+import AuthCallback from "./pages/AuthCallback";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,6 +46,7 @@ const App: React.FC = () => {
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/dashboard/create" element={<CreatePortfolio />} />
                   <Route path="/dashboard/preview/:id" element={<PortfolioPreview />} />
