@@ -1,6 +1,7 @@
 
 import IntegrationCard from "@/components/dashboard/IntegrationCard";
 import EnhancedGitHubIntegration from "@/components/dashboard/EnhancedGitHubIntegration";
+import EnhancedLinkedInIntegration from "@/components/dashboard/EnhancedLinkedInIntegration";
 import { useToast } from "@/components/ui/use-toast";
 import { useGitHubIntegration } from "@/hooks/useGitHubIntegration";
 import { useLinkedInIntegration } from "@/hooks/useLinkedInIntegration";
@@ -134,6 +135,9 @@ export default function IntegrationsTab() {
           {githubConnected && (
             <TabsTrigger value="github-advanced">GitHub Analytics</TabsTrigger>
           )}
+          {linkedinConnected && (
+            <TabsTrigger value="linkedin-advanced">LinkedIn Insights</TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="connections">
@@ -183,7 +187,7 @@ export default function IntegrationsTab() {
                   <circle cx="4" cy="4" r="2"></circle>
                 </svg>
               }
-              description="Import your professional experience, education, and skills."
+              description="Import your professional experience, education, and skills with advanced career insights."
               isConnected={linkedinConnected}
               onConnect={handleConnectLinkedin}
               onDisconnect={handleDisconnectLinkedin}
@@ -198,6 +202,12 @@ export default function IntegrationsTab() {
         {githubConnected && (
           <TabsContent value="github-advanced">
             <EnhancedGitHubIntegration />
+          </TabsContent>
+        )}
+
+        {linkedinConnected && (
+          <TabsContent value="linkedin-advanced">
+            <EnhancedLinkedInIntegration />
           </TabsContent>
         )}
       </Tabs>
