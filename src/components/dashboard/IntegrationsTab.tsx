@@ -6,6 +6,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { useGitHubIntegration } from "@/hooks/useGitHubIntegration";
 import { useLinkedInIntegration } from "@/hooks/useLinkedInIntegration";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export default function IntegrationsTab() {
   const { toast } = useToast();
@@ -98,16 +100,24 @@ export default function IntegrationsTab() {
     try {
       await connectLinkedIn();
       toast({
-        title: "LinkedIn OAuth initiated",
+        title: "LinkedIn Demo Profile Created",
         description:
-          "You'll be redirected to LinkedIn to authorize the connection.",
+          "A demo LinkedIn profile has been created for testing purposes.",
       });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "LinkedIn connection failed",
-        description: "There was an error initiating the LinkedIn OAuth flow.",
-      });
+    } catch (error: any) {
+      if (error.message?.includes("LinkedIn OAuth is not fully configured")) {
+        toast({
+          variant: "destructive",
+          title: "LinkedIn OAuth Setup Required",
+          description: error.message,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "LinkedIn connection failed",
+          description: "There was an error creating the LinkedIn connection.",
+        });
+      }
     }
   };
 
@@ -129,6 +139,15 @@ export default function IntegrationsTab() {
 
   return (
     <div className="mt-6">
+      <Alert className="mb-6">
+        <Info className="h-4 w-4" />
+        <AlertDescription>
+          <strong>LinkedIn Integration Notice:</strong> LinkedIn OAuth requires special configuration in Supabase. 
+          The LinkedIn integration currently uses demo data for testing. To enable full LinkedIn OAuth, 
+          please configure the LinkedIn provider in your Supabase Auth settings.
+        </AlertDescription>
+      </Alert>
+
       <Tabs defaultValue="connections" className="space-y-6">
         <TabsList>
           <TabsTrigger value="connections">Connections</TabsTrigger>
@@ -187,7 +206,7 @@ export default function IntegrationsTab() {
                   <circle cx="4" cy="4" r="2"></circle>
                 </svg>
               }
-              description="Import your professional experience, education, and skills with advanced career insights."
+              description="Import your professional experience, education, and skills with advanced career insights. (Demo Mode)"
               isConnected={linkedinConnected}
               onConnect={handleConnectLinkedin}
               onDisconnect={handleDisconnectLinkedin}
