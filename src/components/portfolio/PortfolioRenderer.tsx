@@ -7,6 +7,9 @@ import CreativeBoldTemplate from './templates/CreativeBoldTemplate';
 import ClassicProfessionalTemplate from './templates/ClassicProfessionalTemplate';
 import TechModernTemplate from './templates/TechModernTemplate';
 import ElegantSimpleTemplate from './templates/ElegantSimpleTemplate';
+import FuturisticGradientTemplate from './templates/FuturisticGradientTemplate';
+import NeonCyberpunkTemplate from './templates/NeonCyberpunkTemplate';
+import MinimalistModernTemplate from './templates/MinimalistModernTemplate';
 
 interface PortfolioRendererProps {
   templateId: string;
@@ -21,6 +24,9 @@ const templateComponents = {
   'classic-professional': ClassicProfessionalTemplate,
   'tech-modern': TechModernTemplate,
   'elegant-simple': ElegantSimpleTemplate,
+  'futuristic-gradient': FuturisticGradientTemplate,
+  'neon-cyberpunk': NeonCyberpunkTemplate,
+  'minimalist-modern': MinimalistModernTemplate,
 };
 
 export default function PortfolioRenderer({
