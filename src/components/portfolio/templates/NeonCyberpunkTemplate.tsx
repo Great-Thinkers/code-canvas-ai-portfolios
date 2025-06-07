@@ -118,7 +118,7 @@ export default function NeonCyberpunkTemplate({
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {skills.technical.map((skill: any, index: number) => (
                     <div key={index} className="text-sm">
-                      <span className="text-green-400">></span> {skill.name}
+                      <span className="text-green-400">{'>'}</span> {skill.name}
                     </div>
                   ))}
                 </div>
