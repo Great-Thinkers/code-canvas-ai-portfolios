@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 export type ContentType = 'bio' | 'project' | 'skill' | 'experience' | 'summary';
 export type ContentTone = 'professional' | 'casual' | 'creative';
@@ -23,8 +24,21 @@ interface AIGenerationResult {
 export function useAIContentGeneration() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [lastGenerated, setLastGenerated] = useState<AIGenerationResult | null>(null);
+  const { canUseAI, subscription, usage } = useSubscription();
 
   const generateContent = async (options: GenerateContentOptions): Promise<string | null> => {
+    if (!canUseAI) {
+      toast.error("Upgrade your plan to use AI content generation.");
+      return null;
+    }
+
+    // Example: Limit free users to 5 AI generations
+    // This logic might be more complex depending on how limits are defined in SubscriptionContext/backend
+    if (subscription?.plan?.name === 'Free' && usage && usage.ai_generations_count >= 5) {
+      toast.error("You've reached your AI generation limit for the free plan.");
+      return null;
+    }
+
     setIsGenerating(true);
     
     try {
