@@ -1,9 +1,15 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
+import SubscriptionCard from "./SubscriptionCard";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function AccountTab() {
   const { user } = useAuth();
+  const { subscription } = useSubscription();
   const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -30,50 +36,41 @@ export default function AccountTab() {
 
   return (
     <div className="mt-6">
-      <div className="max-w-2xl">
-        <h2 className="text-xl font-semibold mb-4">Account Settings</h2>
-        <p className="text-muted-foreground mb-8">
-          Manage your account preferences and subscription details.
-        </p>
-        <div className="space-y-8">
-          <div>
-            <h3 className="text-lg font-medium mb-2">Subscription Plan</h3>
-            <div className="p-4 rounded-lg border border-border bg-muted/50">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-medium">Free Plan</p>
-                  <p className="text-sm text-muted-foreground">
-                    2/2 portfolios used
-                  </p>
-                </div>
-                <button className="text-sm font-medium text-brand-500 hover:text-brand-600">
-                  Upgrade
-                </button>
-              </div>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Subscription Information */}
+        <SubscriptionCard />
 
-          <div>
-            <h3 className="text-lg font-medium mb-2">Account Information</h3>
-            <div className="p-4 rounded-lg border border-border bg-muted/50">
-              <p className="font-medium">
-                {userProfile?.full_name || user?.email}
+        {/* Account Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Account Information</CardTitle>
+            <CardDescription>Your account details and settings</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Full Name</label>
+              <p className="text-sm text-muted-foreground">
+                {userProfile?.full_name || "Not set"}
               </p>
-              <p className="text-sm text-muted-foreground mb-2">
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Email</label>
+              <p className="text-sm text-muted-foreground">
                 {user?.email}
               </p>
-              <div className="flex gap-2 text-sm">
-                <button className="text-brand-500 hover:text-brand-600 font-medium">
-                  Change email
-                </button>
-                <span className="text-muted-foreground">•</span>
-                <button className="text-brand-500 hover:text-brand-600 font-medium">
-                  Change password
-                </button>
-              </div>
             </div>
-          </div>
-        </div>
+
+            <div className="flex gap-2 text-sm pt-4">
+              <Button variant="outline" size="sm">
+                Change email
+              </Button>
+              <Button variant="outline" size="sm">
+                Change password
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

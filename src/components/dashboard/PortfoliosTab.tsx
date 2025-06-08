@@ -3,8 +3,12 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import PortfolioCard from "@/components/dashboard/PortfolioCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Crown, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 interface Portfolio {
@@ -20,6 +24,7 @@ interface Portfolio {
 
 export default function PortfoliosTab() {
   const { user } = useAuth();
+  const { canCreatePortfolio, remainingPortfolios, subscription, refreshSubscription } = useSubscription();
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,8 +57,10 @@ export default function PortfoliosTab() {
     }
   };
 
-  const handleDeletePortfolio = (portfolioId: string) => {
+  const handleDeletePortfolio = async (portfolioId: string) => {
     setPortfolios(portfolios.filter(p => p.id !== portfolioId));
+    // Refresh subscription to update usage counts
+    await refreshSubscription();
   };
 
   if (loading) {
@@ -76,7 +83,49 @@ export default function PortfoliosTab() {
   }
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 space-y-6">
+      {/* Subscription Status Alert */}
+      {!canCreatePortfolio && (
+        <Alert>
+          <Crown className="h-4 w-4" />
+          <AlertDescription>
+            You've reached your portfolio limit ({subscription?.plan.max_portfolios} portfolios). 
+            <Link to="/pricing" className="font-medium text-primary hover:underline ml-1">
+              Upgrade to Pro
+            </Link> for unlimited portfolios and premium features.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Create Portfolio Button */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h3 className="text-lg font-semibold">Your Portfolios</h3>
+          {subscription && (
+            <p className="text-sm text-muted-foreground">
+              {portfolios.length} of {subscription.plan.max_portfolios === -1 ? "unlimited" : subscription.plan.max_portfolios} portfolios used
+            </p>
+          )}
+        </div>
+        
+        {canCreatePortfolio ? (
+          <Link to="/dashboard/create">
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Create Portfolio
+            </Button>
+          </Link>
+        ) : (
+          <Link to="/pricing">
+            <Button>
+              <Crown className="w-4 h-4 mr-2" />
+              Upgrade to Create More
+            </Button>
+          </Link>
+        )}
+      </div>
+
+      {/* Portfolios Grid */}
       {portfolios.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {portfolios.map((portfolio) => (
@@ -93,11 +142,21 @@ export default function PortfoliosTab() {
           <p className="text-muted-foreground mb-4">
             Create your first portfolio to get started
           </p>
-          <Link to="/dashboard/create">
-            <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-              Create Portfolio
-            </button>
-          </Link>
+          {canCreatePortfolio ? (
+            <Link to="/dashboard/create">
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Portfolio
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/pricing">
+              <Button>
+                <Crown className="w-4 h-4 mr-2" />
+                Upgrade to Get Started
+              </Button>
+            </Link>
+          )}
         </div>
       )}
     </div>
