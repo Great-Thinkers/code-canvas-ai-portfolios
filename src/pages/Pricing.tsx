@@ -1,15 +1,16 @@
-
 import { useEffect, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Crown, Zap } from "lucide-react";
+import { Check, Crown, Loader2, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { useStripe } from "@/hooks/useStripe";
+import { Link, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 interface SubscriptionPlan {
   id: string;
@@ -24,12 +25,22 @@ interface SubscriptionPlan {
 export default function Pricing() {
   const { user } = useAuth();
   const { subscription } = useSubscription();
+  const { createCheckoutSession, loading: stripeLoading } = useStripe();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     fetchPlans();
-  }, []);
+    
+    // Handle checkout success/cancel from URL params
+    const checkout = searchParams.get('checkout');
+    if (checkout === 'success') {
+      toast.success("Subscription activated successfully!");
+    } else if (checkout === 'cancelled') {
+      toast.error("Checkout was cancelled");
+    }
+  }, [searchParams]);
 
   const fetchPlans = async () => {
     try {
@@ -76,6 +87,24 @@ export default function Pricing() {
 
   const formatPrice = (price: number) => {
     return price === 0 ? "Free" : `$${(price / 100).toFixed(2)}`;
+  };
+
+  const handlePlanAction = async (plan: SubscriptionPlan) => {
+    if (!user) {
+      // Redirect to signup for non-authenticated users
+      return;
+    }
+
+    const currentPlanId = getCurrentPlanId();
+    
+    if (currentPlanId === plan.id) {
+      return; // Current plan, do nothing
+    }
+
+    // For now, only handle upgrades to paid plans
+    if (plan.name !== "Free") {
+      await createCheckoutSession(plan.id);
+    }
   };
 
   return (
@@ -160,8 +189,11 @@ export default function Pricing() {
                           <Button 
                             className="w-full" 
                             variant={isPro ? "default" : "outline"}
+                            onClick={() => handlePlanAction(plan)}
+                            disabled={stripeLoading}
                           >
-                            {isPro ? "Upgrade to Pro" : "Downgrade to Free"}
+                            {stripeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {plan.name === "Free" ? "Downgrade to Free" : `Upgrade to ${plan.name}`}
                           </Button>
                         ) : (
                           <Link to="/signup">
