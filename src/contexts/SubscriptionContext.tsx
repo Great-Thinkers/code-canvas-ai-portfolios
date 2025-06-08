@@ -68,7 +68,14 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
         .order("price_monthly", { ascending: true });
 
       if (error) throw error;
-      setPlans(data || []);
+      
+      // Transform the data to match our interface types
+      const transformedPlans: SubscriptionPlan[] = (data || []).map(plan => ({
+        ...plan,
+        features: plan.features as Record<string, boolean>
+      }));
+      
+      setPlans(transformedPlans);
     } catch (error) {
       console.error("Error fetching plans:", error);
       toast.error("Failed to load subscription plans");
@@ -89,7 +96,18 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
         .single();
 
       if (error && error.code !== "PGRST116") throw error;
-      setSubscription(data);
+      
+      if (data) {
+        // Transform the nested plan data
+        const transformedSubscription: UserSubscription = {
+          ...data,
+          plan: {
+            ...data.plan,
+            features: data.plan.features as Record<string, boolean>
+          }
+        };
+        setSubscription(transformedSubscription);
+      }
     } catch (error) {
       console.error("Error fetching subscription:", error);
     }
