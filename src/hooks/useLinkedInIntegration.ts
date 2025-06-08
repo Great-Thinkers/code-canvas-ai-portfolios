@@ -59,18 +59,8 @@ export const useLinkedInIntegration = () => {
   const connectLinkedIn = async () => {
     setLoading(true);
     try {
-      // Check if LinkedIn provider is enabled first
-      const { data: providers, error: providerError } = await supabase.auth.getOAuthProviders();
-      
-      if (providerError) {
-        console.error("Error checking OAuth providers:", providerError);
-        throw new Error("Unable to check available authentication providers");
-      }
-
-      // For now, we'll simulate the LinkedIn connection since the provider might not be enabled
-      // This allows the demo to work while the OAuth setup is being configured
+      // For now, we'll simulate the LinkedIn connection since OAuth setup requires configuration
       console.log("LinkedIn OAuth would be initiated here");
-      console.log("Available providers:", providers);
       
       // Instead of real OAuth, we'll create a demo profile for testing
       const demoProfile = {
