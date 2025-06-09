@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,7 +14,7 @@ import { useAIContentGeneration } from "@/hooks/useAIContentGeneration";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
 import Link from "next/link";
-import { Progress } from "@/components/ui/progress"; // Assuming you have a Progress component
+import { Progress } from "@/components/ui/progress";
 
 interface AIContentGeneratorProps {
   type: "bio" | "project_description" | "skill_summary" | "experience_summary";
@@ -50,13 +51,10 @@ export default function AIContentGenerator({
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const maxGenerations = useMemo(() => {
-    if (
-      !subscription ||
-      !subscription.plan ||
-      typeof subscription.plan.max_ai_generations !== "number"
-    )
-      return 0;
-    return subscription.plan.max_ai_generations;
+    if (!subscription?.plan) return 0;
+    const planMaxGenerations = subscription.plan.max_ai_generations;
+    if (typeof planMaxGenerations !== "number") return 0;
+    return planMaxGenerations;
   }, [subscription]);
 
   const currentGenerationCount = useMemo(() => {
@@ -78,12 +76,12 @@ export default function AIContentGenerator({
 
   const handleGenerate = async () => {
     if (!canUseAI || hasReachedLimit) {
-      // Toast messages are handled by useAIContentGeneration hook or below
       if (!canUseAI) toast.error("Upgrade your plan to generate content.");
       else if (hasReachedLimit)
         toast.error("You've reached your generation limit.");
       return;
     }
+    
     try {
       const content = await generateContent({
         type:
@@ -102,11 +100,19 @@ export default function AIContentGenerator({
         toast.success("Content generated successfully!");
       }
     } catch (error) {
+      console.error("AI generation error:", error);
       toast.error("Failed to generate content. Please try again.");
     }
   };
 
   const handleGenerateVariations = async () => {
+    if (!canUseAI || hasReachedLimit) {
+      if (!canUseAI) toast.error("Upgrade your plan to generate content.");
+      else if (hasReachedLimit)
+        toast.error("You've reached your generation limit.");
+      return;
+    }
+
     try {
       const variations = await Promise.all(
         (["professional", "casual", "creative"] as const).map((tone) =>
@@ -127,9 +133,10 @@ export default function AIContentGenerator({
       const validVariations = (variations.filter(Boolean) as string[]).slice(
         0,
         3
-      ); // Take up to 3
+      );
       setSuggestions(validVariations);
     } catch (error) {
+      console.error("AI variations error:", error);
       toast.error("Failed to generate variations. Please try again.");
     }
   };
@@ -139,7 +146,6 @@ export default function AIContentGenerator({
       {label && (
         <div className="flex items-center justify-between mb-2">
           <label className="text-sm font-medium">{label}</label>
-          {/* Action Buttons Group */}
           <div className="flex gap-2">
             <Button
               type="button"
@@ -200,7 +206,7 @@ export default function AIContentGenerator({
               {maxGenerations === -1 ? "Unlimited" : maxGenerations}
             </span>
             {generationsRemaining <= 5 &&
-              maxGenerations !== -1 && ( // Show warning if 5 or less remain
+              maxGenerations !== -1 && (
                 <span
                   className={`text-xs ${
                     generationsRemaining === 0

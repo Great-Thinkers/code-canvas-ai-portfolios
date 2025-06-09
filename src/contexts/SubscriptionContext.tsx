@@ -11,6 +11,7 @@ interface SubscriptionPlan {
   price_monthly: number;
   price_yearly: number;
   max_portfolios: number;
+  max_ai_generations?: number; // Make this optional for safety
   features: Record<string, boolean>;
   is_active: boolean;
 }
@@ -69,10 +70,11 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) throw error;
       
-      // Transform the data to match our interface types
+      // Transform the data to match our interface types with safety checks
       const transformedPlans: SubscriptionPlan[] = (data || []).map(plan => ({
         ...plan,
-        features: plan.features as Record<string, boolean>
+        features: plan.features as Record<string, boolean> || {},
+        max_ai_generations: plan.max_ai_generations || 0, // Provide default
       }));
       
       setPlans(transformedPlans);
@@ -97,19 +99,72 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error && error.code !== "PGRST116") throw error;
       
-      if (data) {
-        // Transform the nested plan data
+      if (data && data.plan) {
+        // Transform the nested plan data with safety checks
         const transformedSubscription: UserSubscription = {
           ...data,
           plan: {
             ...data.plan,
-            features: data.plan.features as Record<string, boolean>
+            features: data.plan.features as Record<string, boolean> || {},
+            max_ai_generations: data.plan.max_ai_generations || 0, // Provide default
+          }
+        };
+        setSubscription(transformedSubscription);
+      } else {
+        // If no subscription found, try to create a default free subscription
+        await createDefaultSubscription();
+      }
+    } catch (error) {
+      console.error("Error fetching subscription:", error);
+      // Don't show error toast for missing subscription, it's expected for new users
+    }
+  };
+
+  const createDefaultSubscription = async () => {
+    if (!user) return;
+
+    try {
+      // Get the free plan
+      const { data: freePlan, error: planError } = await supabase
+        .from("subscription_plans")
+        .select("*")
+        .eq("name", "Free")
+        .single();
+
+      if (planError || !freePlan) {
+        console.error("No free plan found:", planError);
+        return;
+      }
+
+      // Create user subscription
+      const { data: newSubscription, error: subError } = await supabase
+        .from("user_subscriptions")
+        .insert({
+          user_id: user.id,
+          plan_id: freePlan.id,
+          status: "active",
+        })
+        .select(`
+          *,
+          plan:subscription_plans(*)
+        `)
+        .single();
+
+      if (subError) throw subError;
+
+      if (newSubscription && newSubscription.plan) {
+        const transformedSubscription: UserSubscription = {
+          ...newSubscription,
+          plan: {
+            ...newSubscription.plan,
+            features: newSubscription.plan.features as Record<string, boolean> || {},
+            max_ai_generations: newSubscription.plan.max_ai_generations || 0,
           }
         };
         setSubscription(transformedSubscription);
       }
     } catch (error) {
-      console.error("Error fetching subscription:", error);
+      console.error("Error creating default subscription:", error);
     }
   };
 
@@ -124,7 +179,24 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
         .single();
 
       if (error && error.code !== "PGRST116") throw error;
-      setUsage(data);
+      
+      if (data) {
+        setUsage(data);
+      } else {
+        // Create default usage if none exists
+        const { data: newUsage, error: usageError } = await supabase
+          .from("user_usage")
+          .insert({
+            user_id: user.id,
+            portfolios_count: 0,
+            ai_generations_count: 0,
+          })
+          .select()
+          .single();
+
+        if (usageError) throw usageError;
+        setUsage(newUsage);
+      }
     } catch (error) {
       console.error("Error fetching usage:", error);
     }
@@ -158,7 +230,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const canUseAI = React.useMemo(() => {
     if (!subscription) return false;
-    return subscription.plan.features.ai_content === true;
+    return subscription.plan.features?.ai_content === true;
   }, [subscription]);
 
   const remainingPortfolios = React.useMemo(() => {
