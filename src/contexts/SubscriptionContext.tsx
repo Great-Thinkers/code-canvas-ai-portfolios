@@ -11,7 +11,7 @@ interface SubscriptionPlan {
   price_monthly: number;
   price_yearly: number;
   max_portfolios: number;
-  max_ai_generations?: number; // Make this optional for safety
+  max_ai_generations: number;
   features: Record<string, boolean>;
   is_active: boolean;
 }
@@ -73,8 +73,8 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
       // Transform the data to match our interface types with safety checks
       const transformedPlans: SubscriptionPlan[] = (data || []).map(plan => ({
         ...plan,
-        features: plan.features as Record<string, boolean> || {},
-        max_ai_generations: plan.max_ai_generations || 0, // Provide default
+        features: (plan.features as Record<string, boolean>) || {},
+        max_ai_generations: (plan as any).max_ai_generations || 0,
       }));
       
       setPlans(transformedPlans);
@@ -105,8 +105,8 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
           ...data,
           plan: {
             ...data.plan,
-            features: data.plan.features as Record<string, boolean> || {},
-            max_ai_generations: data.plan.max_ai_generations || 0, // Provide default
+            features: (data.plan.features as Record<string, boolean>) || {},
+            max_ai_generations: (data.plan as any).max_ai_generations || 0,
           }
         };
         setSubscription(transformedSubscription);
@@ -157,8 +157,8 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
           ...newSubscription,
           plan: {
             ...newSubscription.plan,
-            features: newSubscription.plan.features as Record<string, boolean> || {},
-            max_ai_generations: newSubscription.plan.max_ai_generations || 0,
+            features: (newSubscription.plan.features as Record<string, boolean>) || {},
+            max_ai_generations: (newSubscription.plan as any).max_ai_generations || 0,
           }
         };
         setSubscription(transformedSubscription);

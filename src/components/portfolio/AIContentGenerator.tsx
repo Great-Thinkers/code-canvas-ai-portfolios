@@ -13,7 +13,7 @@ import {
 import { useAIContentGeneration } from "@/hooks/useAIContentGeneration";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 
 interface AIContentGeneratorProps {
@@ -187,7 +187,7 @@ export default function AIContentGenerator({
           <div>
             AI content generation is disabled.
             <Link
-              href="/pricing"
+              to="/pricing"
               className="font-semibold underline ml-1 hover:text-yellow-800"
             >
               Upgrade your plan
@@ -231,7 +231,7 @@ export default function AIContentGenerator({
               <div>
                 You've reached your generation limit.
                 <Link
-                  href="/pricing"
+                  to="/pricing"
                   className="font-semibold underline ml-1 hover:text-red-700"
                 >
                   Upgrade
