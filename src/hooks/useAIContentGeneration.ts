@@ -24,7 +24,7 @@ interface AIGenerationResult {
 export function useAIContentGeneration() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [lastGenerated, setLastGenerated] = useState<AIGenerationResult | null>(null);
-  const { canUseAI, subscription, usage } = useSubscription();
+  const { canUseAI, subscription, usage, refreshSubscription } = useSubscription();
 
   const generateContent = async (options: GenerateContentOptions): Promise<string | null> => {
     if (!canUseAI) {
@@ -32,10 +32,12 @@ export function useAIContentGeneration() {
       return null;
     }
 
-    // Example: Limit free users to 5 AI generations
-    // This logic might be more complex depending on how limits are defined in SubscriptionContext/backend
-    if (subscription?.plan?.name === 'Free' && usage && usage.ai_generations_count >= 5) {
-      toast.error("You've reached your AI generation limit for the free plan.");
+    // Check if user has reached their AI generation limit
+    const maxGenerations = subscription?.plan?.max_ai_generations || 0;
+    const currentCount = usage?.ai_generations_count || 0;
+
+    if (maxGenerations !== -1 && currentCount >= maxGenerations) {
+      toast.error("You've reached your AI generation limit. Upgrade for more generations.");
       return null;
     }
 
@@ -62,6 +64,10 @@ export function useAIContentGeneration() {
 
       setLastGenerated(data);
       toast.success('Content generated successfully!');
+      
+      // Refresh subscription data to update usage counts
+      await refreshSubscription();
+      
       return data.content;
 
     } catch (error) {

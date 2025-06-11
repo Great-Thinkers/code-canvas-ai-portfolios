@@ -71,7 +71,6 @@ export default function AIContentGenerator({
     return currentGenerationCount >= maxGenerations;
   }, [currentGenerationCount, maxGenerations]);
 
-  // Combine isGeneratingContent with subscriptionLoading for disabling buttons
   const isGenerating = isGeneratingContent || subscriptionLoading;
 
   const handleGenerate = async () => {
@@ -188,7 +187,7 @@ export default function AIContentGenerator({
           <div>
             AI content generation is disabled.
             <Link
-              href="/dashboard/settings/billing"
+              href="/pricing"
               className="font-semibold underline ml-1 hover:text-yellow-800"
             >
               Upgrade your plan
@@ -232,7 +231,7 @@ export default function AIContentGenerator({
               <div>
                 You've reached your generation limit.
                 <Link
-                  href="/dashboard/settings/billing"
+                  href="/pricing"
                   className="font-semibold underline ml-1 hover:text-red-700"
                 >
                   Upgrade
