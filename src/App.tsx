@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -20,6 +19,9 @@ import NotFound from "./pages/NotFound";
 import PortfolioPreview from "./pages/PortfolioPreview";
 import PortfolioEditor from "./pages/PortfolioEditor";
 import AuthCallback from "./pages/AuthCallback";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,9 +52,21 @@ const App: React.FC = () => {
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/dashboard/create" element={<CreatePortfolio />} />
-                    <Route path="/dashboard/preview/:id" element={<PortfolioPreview />} />
-                    <Route path="/dashboard/edit/:id" element={<PortfolioEditor />} />
+                    <Route
+                      path="/dashboard/create"
+                      element={<CreatePortfolio />}
+                    />
+                    <Route
+                      path="/dashboard/preview/:id"
+                      element={<PortfolioPreview />}
+                    />
+                    <Route
+                      path="/dashboard/edit/:id"
+                      element={<PortfolioEditor />}
+                    />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/contact" element={<Contact />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
