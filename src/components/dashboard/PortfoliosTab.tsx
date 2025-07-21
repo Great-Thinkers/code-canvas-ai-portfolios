@@ -1,5 +1,4 @@
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Crown, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { PortfolioData } from "@/types/templates";
 
 interface Portfolio {
   id: string;
@@ -18,23 +18,22 @@ interface Portfolio {
   template_id: number;
   updated_at: string;
   is_published: boolean;
-  portfolio_data: any;
+  portfolio_data: PortfolioData;
   created_at: string;
 }
 
 export default function PortfoliosTab() {
   const { user } = useAuth();
-  const { canCreatePortfolio, remainingPortfolios, subscription, refreshSubscription } = useSubscription();
+  const {
+    canCreatePortfolio,
+    remainingPortfolios,
+    subscription,
+    refreshSubscription,
+  } = useSubscription();
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      fetchPortfolios();
-    }
-  }, [user]);
-
-  const fetchPortfolios = async () => {
+  const fetchPortfolios = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("portfolios")
@@ -55,10 +54,16 @@ export default function PortfoliosTab() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchPortfolios();
+    }
+  }, [user, fetchPortfolios]);
 
   const handleDeletePortfolio = async (portfolioId: string) => {
-    setPortfolios(portfolios.filter(p => p.id !== portfolioId));
+    setPortfolios(portfolios.filter((p) => p.id !== portfolioId));
     // Refresh subscription to update usage counts
     await refreshSubscription();
   };
@@ -89,10 +94,15 @@ export default function PortfoliosTab() {
         <Alert>
           <Crown className="h-4 w-4" />
           <AlertDescription>
-            You've reached your portfolio limit ({subscription?.plan.max_portfolios} portfolios). 
-            <Link to="/pricing" className="font-medium text-primary hover:underline ml-1">
+            You've reached your portfolio limit (
+            {subscription?.plan.max_portfolios} portfolios).
+            <Link
+              to="/pricing"
+              className="font-medium text-primary hover:underline ml-1"
+            >
               Upgrade to Pro
-            </Link> for unlimited portfolios and premium features.
+            </Link>{" "}
+            for unlimited portfolios and premium features.
           </AlertDescription>
         </Alert>
       )}
@@ -103,11 +113,15 @@ export default function PortfoliosTab() {
           <h3 className="text-lg font-semibold">Your Portfolios</h3>
           {subscription && (
             <p className="text-sm text-muted-foreground">
-              {portfolios.length} of {subscription.plan.max_portfolios === -1 ? "unlimited" : subscription.plan.max_portfolios} portfolios used
+              {portfolios.length} of{" "}
+              {subscription.plan.max_portfolios === -1
+                ? "unlimited"
+                : subscription.plan.max_portfolios}{" "}
+              portfolios used
             </p>
           )}
         </div>
-        
+
         {canCreatePortfolio ? (
           <Link to="/dashboard/create">
             <Button>

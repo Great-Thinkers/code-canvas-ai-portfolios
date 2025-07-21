@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Dialog,
@@ -12,14 +11,23 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Sparkles, Copy, Check } from "lucide-react";
-import { useAIContentGeneration, ContentType, ContentTone, ContentLength } from "@/hooks/useAIContentGeneration";
+import {
+  useAIContentGeneration,
+  ContentType,
+  ContentTone,
+  ContentLength,
+} from "@/hooks/useAIContentGeneration";
 import { toast } from "sonner";
+
+interface Context {
+  [key: string]: any;
+}
 
 interface AIContentGeneratorDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   contentType: ContentType;
-  context: any;
+  context: Context;
   onAccept: (content: string) => void;
   initialContent?: string;
 }
@@ -30,11 +38,11 @@ export default function AIContentGeneratorDialog({
   contentType,
   context,
   onAccept,
-  initialContent = ""
+  initialContent = "",
 }: AIContentGeneratorDialogProps) {
   const { isGenerating, generateContent } = useAIContentGeneration();
-  const [tone, setTone] = useState<ContentTone>('professional');
-  const [length, setLength] = useState<ContentLength>('medium');
+  const [tone, setTone] = useState<ContentTone>("professional");
+  const [length, setLength] = useState<ContentLength>("medium");
   const [generatedContent, setGeneratedContent] = useState(initialContent);
   const [copied, setCopied] = useState(false);
 
@@ -43,7 +51,7 @@ export default function AIContentGeneratorDialog({
       type: contentType,
       context,
       tone,
-      length
+      length,
     });
 
     if (content) {
@@ -55,7 +63,7 @@ export default function AIContentGeneratorDialog({
     if (generatedContent) {
       await navigator.clipboard.writeText(generatedContent);
       setCopied(true);
-      toast.success('Content copied to clipboard');
+      toast.success("Content copied to clipboard");
       setTimeout(() => setCopied(false), 2000);
     }
   };
@@ -69,12 +77,18 @@ export default function AIContentGeneratorDialog({
 
   const getContentTypeLabel = () => {
     switch (contentType) {
-      case 'bio': return 'Bio';
-      case 'project': return 'Project Description';
-      case 'skill': return 'Skill Description';
-      case 'experience': return 'Experience Summary';
-      case 'summary': return 'Professional Summary';
-      default: return 'Content';
+      case "bio":
+        return "Bio";
+      case "project":
+        return "Project Description";
+      case "skill":
+        return "Skill Description";
+      case "experience":
+        return "Experience Summary";
+      case "summary":
+        return "Professional Summary";
+      default:
+        return "Content";
     }
   };
 
@@ -87,7 +101,8 @@ export default function AIContentGeneratorDialog({
             Generate {getContentTypeLabel()} with AI
           </DialogTitle>
           <DialogDescription>
-            Customize the tone and length, then generate AI-powered content for your portfolio.
+            Customize the tone and length, then generate AI-powered content for
+            your portfolio.
           </DialogDescription>
         </DialogHeader>
 
@@ -95,7 +110,10 @@ export default function AIContentGeneratorDialog({
           {/* Tone Selection */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">Tone</Label>
-            <RadioGroup value={tone} onValueChange={(value) => setTone(value as ContentTone)}>
+            <RadioGroup
+              value={tone}
+              onValueChange={(value) => setTone(value as ContentTone)}
+            >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="professional" id="professional" />
                 <Label htmlFor="professional">Professional</Label>
@@ -112,10 +130,13 @@ export default function AIContentGeneratorDialog({
           </div>
 
           {/* Length Selection */}
-          {contentType !== 'skill' && (
+          {contentType !== "skill" && (
             <div className="space-y-3">
               <Label className="text-sm font-medium">Length</Label>
-              <RadioGroup value={length} onValueChange={(value) => setLength(value as ContentLength)}>
+              <RadioGroup
+                value={length}
+                onValueChange={(value) => setLength(value as ContentLength)}
+              >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="short" id="short" />
                   <Label htmlFor="short">Short</Label>
@@ -133,8 +154,8 @@ export default function AIContentGeneratorDialog({
           )}
 
           {/* Generate Button */}
-          <Button 
-            onClick={handleGenerate} 
+          <Button
+            onClick={handleGenerate}
             disabled={isGenerating}
             className="w-full"
           >
@@ -167,7 +188,7 @@ export default function AIContentGeneratorDialog({
                   ) : (
                     <Copy className="h-4 w-4" />
                   )}
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </div>
               <Textarea
@@ -181,11 +202,15 @@ export default function AIContentGeneratorDialog({
 
           {/* Action Buttons */}
           <div className="flex gap-2 pt-4">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="flex-1"
+            >
               Cancel
             </Button>
-            <Button 
-              onClick={handleAccept} 
+            <Button
+              onClick={handleAccept}
               disabled={!generatedContent}
               className="flex-1"
             >

@@ -20,7 +20,7 @@ interface EducationSectionProps {
   data: {
     education?: Education[];
   };
-  onChange: (data: any) => void;
+  onChange: (data: { education?: Education[] }) => void;
 }
 
 export default function EducationSection({

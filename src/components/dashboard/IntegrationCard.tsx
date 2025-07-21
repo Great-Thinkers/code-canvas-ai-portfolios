@@ -10,6 +10,21 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Loader2, RefreshCw } from "lucide-react";
 
+interface GitHubProfile {
+  username: string;
+  public_repos: number;
+  followers: number;
+}
+
+interface LinkedInProfile {
+  first_name?: string;
+  last_name?: string;
+  headline?: string;
+  connections_count?: number;
+}
+
+type ProfileData = GitHubProfile | LinkedInProfile | { user_metadata: any };
+
 type IntegrationCardProps = {
   name: string;
   icon: React.ReactNode;
@@ -20,7 +35,7 @@ type IntegrationCardProps = {
   onSyncData?: () => Promise<void>;
   loading?: boolean;
   lastSynced?: string | null;
-  profileData?: any;
+  profileData?: ProfileData | null;
 };
 
 export default function IntegrationCard({
@@ -47,17 +62,21 @@ export default function IntegrationCard({
 
   const getProfileInfo = () => {
     if (name === "GitHub" && profileData) {
+      const githubProfile = profileData as GitHubProfile;
       return {
-        username: profileData.username,
-        repos: profileData.public_repos,
-        followers: profileData.followers,
+        username: githubProfile.username,
+        repos: githubProfile.public_repos,
+        followers: githubProfile.followers,
       };
     }
     if (name === "LinkedIn" && profileData) {
+      const linkedinProfile = profileData as LinkedInProfile;
       return {
-        name: `${profileData.first_name || ""} ${profileData.last_name || ""}`.trim(),
-        headline: profileData.headline,
-        connections: profileData.connections_count,
+        name: `${linkedinProfile.first_name || ""} ${
+          linkedinProfile.last_name || ""
+        }`.trim(),
+        headline: linkedinProfile.headline,
+        connections: linkedinProfile.connections_count,
       };
     }
     return null;

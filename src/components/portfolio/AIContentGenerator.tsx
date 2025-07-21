@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +14,23 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+type Tone = "professional" | "creative" | "technical" | "casual";
+
+interface Experience {
+  [key: string]: any;
+}
+
+interface Repository {
+  [key: string]: any;
+}
 
 interface AIContentGeneratorProps {
   type: "bio" | "project_description" | "skill_summary" | "experience_summary";
@@ -22,8 +38,8 @@ interface AIContentGeneratorProps {
     name?: string;
     title?: string;
     skills?: string[];
-    experience?: any[];
-    repositories?: any[];
+    experience?: Experience[];
+    repositories?: Repository[];
     role?: string;
   };
   value: string;
@@ -49,6 +65,7 @@ export default function AIContentGenerator({
     loading: subscriptionLoading,
   } = useSubscription();
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [tone, setTone] = useState<Tone>("professional");
 
   const maxGenerations = useMemo(() => {
     if (!subscription?.plan) return 0;
@@ -80,7 +97,7 @@ export default function AIContentGenerator({
         toast.error("You've reached your generation limit.");
       return;
     }
-    
+
     try {
       const content = await generateContent({
         type:
@@ -92,7 +109,7 @@ export default function AIContentGenerator({
             ? "experience"
             : type,
         context,
-        tone: "professional",
+        tone,
       });
       if (content) {
         onChange(content);
@@ -114,7 +131,7 @@ export default function AIContentGenerator({
 
     try {
       const variations = await Promise.all(
-        (["professional", "casual", "creative"] as const).map((tone) =>
+        ([tone, "casual", "creative"] as const).map((t) =>
           generateContent({
             type:
               type === "project_description"
@@ -125,7 +142,7 @@ export default function AIContentGenerator({
                 ? "experience"
                 : type,
             context,
-            tone,
+            tone: t,
           })
         )
       );
@@ -145,7 +162,21 @@ export default function AIContentGenerator({
       {label && (
         <div className="flex items-center justify-between mb-2">
           <label className="text-sm font-medium">{label}</label>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <Select
+              value={tone}
+              onValueChange={(value) => setTone(value as Tone)}
+            >
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Tone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="professional">Professional</SelectItem>
+                <SelectItem value="creative">Creative</SelectItem>
+                <SelectItem value="technical">Technical</SelectItem>
+                <SelectItem value="casual">Casual</SelectItem>
+              </SelectContent>
+            </Select>
             <Button
               type="button"
               variant="outline"
@@ -204,20 +235,19 @@ export default function AIContentGenerator({
               AI Generations Used: {currentGenerationCount} /{" "}
               {maxGenerations === -1 ? "Unlimited" : maxGenerations}
             </span>
-            {generationsRemaining <= 5 &&
-              maxGenerations !== -1 && (
-                <span
-                  className={`text-xs ${
-                    generationsRemaining === 0
-                      ? "text-red-500 font-semibold"
-                      : "text-yellow-600"
-                  }`}
-                >
-                  {generationsRemaining === 0
-                    ? "Limit reached"
-                    : `${generationsRemaining} remaining`}
-                </span>
-              )}
+            {generationsRemaining <= 5 && maxGenerations !== -1 && (
+              <span
+                className={`text-xs ${
+                  generationsRemaining === 0
+                    ? "text-red-500 font-semibold"
+                    : "text-yellow-600"
+                }`}
+              >
+                {generationsRemaining === 0
+                  ? "Limit reached"
+                  : `${generationsRemaining} remaining`}
+              </span>
+            )}
           </div>
           {maxGenerations !== -1 && (
             <Progress

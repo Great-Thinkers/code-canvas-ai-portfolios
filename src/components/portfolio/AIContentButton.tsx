@@ -1,17 +1,25 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2 } from "lucide-react";
-import { useAIContentGeneration, ContentType, ContentTone, ContentLength } from "@/hooks/useAIContentGeneration";
+import {
+  useAIContentGeneration,
+  ContentType,
+  ContentTone,
+  ContentLength,
+} from "@/hooks/useAIContentGeneration";
+
+interface Context {
+  [key: string]: any;
+}
 
 interface AIContentButtonProps {
   contentType: ContentType;
-  context: any;
+  context: Context;
   onContentGenerated: (content: string) => void;
   tone?: ContentTone;
   length?: ContentLength;
-  variant?: 'default' | 'outline' | 'ghost';
-  size?: 'default' | 'sm' | 'lg';
+  variant?: "default" | "outline" | "ghost";
+  size?: "default" | "sm" | "lg";
   className?: string;
   children?: React.ReactNode;
 }
@@ -20,12 +28,12 @@ export default function AIContentButton({
   contentType,
   context,
   onContentGenerated,
-  tone = 'professional',
-  length = 'medium',
-  variant = 'outline',
-  size = 'sm',
+  tone = "professional",
+  length = "medium",
+  variant = "outline",
+  size = "sm",
   className,
-  children
+  children,
 }: AIContentButtonProps) {
   const { isGenerating, generateContent } = useAIContentGeneration();
 
@@ -34,7 +42,7 @@ export default function AIContentButton({
       type: contentType,
       context,
       tone,
-      length
+      length,
     });
 
     if (generatedContent) {
@@ -55,7 +63,7 @@ export default function AIContentButton({
       ) : (
         <Sparkles className="h-4 w-4 mr-2" />
       )}
-      {children || (isGenerating ? 'Generating...' : 'Generate with AI')}
+      {children || (isGenerating ? "Generating..." : "Generate with AI")}
     </Button>
   );
 }

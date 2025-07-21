@@ -1,6 +1,10 @@
-
 import { useState, useEffect } from "react";
-import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,11 +19,15 @@ import TemplateSelector from "./TemplateSelector";
 import ThemeCustomizer from "./ThemeCustomizer";
 import TemplatePreviewModal from "./TemplatePreviewModal";
 import { getTemplateById } from "@/data/templates";
-import { TemplateTheme, TemplateCustomization } from "@/types/templates";
+import {
+  TemplateTheme,
+  TemplateCustomization,
+  PortfolioData,
+} from "@/types/templates";
 
 interface PortfolioEditorSectionsProps {
-  portfolioData: any;
-  onChange: (data: any) => void;
+  portfolioData: PortfolioData;
+  onChange: (data: PortfolioData) => void;
   templateName: string;
 }
 
@@ -62,18 +70,25 @@ export default function PortfolioEditorSections({
   templateName,
 }: PortfolioEditorSectionsProps) {
   const [activeSection, setActiveSection] = useState("content");
-  const [previewTemplate, setPreviewTemplate] = useState<TemplateTheme | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<TemplateTheme | null>(
+    null
+  );
   const [showPreview, setShowPreview] = useState(false);
   const [orderedSections, setOrderedSections] = useState(contentSections);
 
   useEffect(() => {
     if (portfolioData.sectionOrder) {
-      const newOrderedSections = portfolioData.sectionOrder.map((id: string) =>
-        contentSections.find(section => section.id === id)
-      ).filter((section: any) => section !== undefined);
+      const newOrderedSections = portfolioData.sectionOrder
+        .map((id: string) =>
+          contentSections.find((section) => section.id === id)
+        )
+        .filter(
+          (section): section is (typeof contentSections)[0] =>
+            section !== undefined
+        );
       // Add any missing sections from contentSections
-      contentSections.forEach(section => {
-        if (!newOrderedSections.find((s: any) => s.id === section.id)) {
+      contentSections.forEach((section) => {
+        if (!newOrderedSections.find((s) => s.id === section.id)) {
           newOrderedSections.push(section);
         }
       });
@@ -82,19 +97,23 @@ export default function PortfolioEditorSections({
       // Initialize sectionOrder if not present
       onChange({
         ...portfolioData,
-        sectionOrder: contentSections.map(s => s.id),
+        sectionOrder: contentSections.map((s) => s.id),
       });
       setOrderedSections(contentSections);
     }
-  }, [portfolioData.sectionOrder, onChange]);
+  }, [portfolioData, onChange]);
 
   const currentTemplateId = portfolioData.template || templateName;
-  const currentTemplate = getTemplateById(currentTemplateId) || getTemplateById('modern-minimal')!;
+  const currentTemplate =
+    getTemplateById(currentTemplateId) || getTemplateById("modern-minimal")!;
   const customization: TemplateCustomization = portfolioData.customization || {
     templateId: currentTemplate.id,
   };
 
-  const handleSectionChange = (sectionId: string, sectionData: any) => {
+  const handleSectionChange = (
+    sectionId: string,
+    sectionData: Partial<PortfolioData>
+  ) => {
     onChange({
       ...portfolioData,
       [sectionId]: sectionData,
@@ -111,7 +130,7 @@ export default function PortfolioEditorSections({
     setOrderedSections(items);
     onChange({
       ...portfolioData,
-      sectionOrder: items.map(section => section.id),
+      sectionOrder: items.map((section) => section.id),
     });
   };
 
@@ -124,7 +143,9 @@ export default function PortfolioEditorSections({
     });
   };
 
-  const handleCustomizationChange = (newCustomization: TemplateCustomization) => {
+  const handleCustomizationChange = (
+    newCustomization: TemplateCustomization
+  ) => {
     onChange({
       customization: newCustomization,
     });
@@ -148,7 +169,9 @@ export default function PortfolioEditorSections({
       {/* Template Info */}
       <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Current Template:</span>
+          <span className="text-sm text-muted-foreground">
+            Current Template:
+          </span>
           <Badge variant="outline">{currentTemplate.name}</Badge>
           {currentTemplate.isPremium && (
             <Badge className="bg-amber-500 text-white text-xs">Premium</Badge>
@@ -178,7 +201,10 @@ export default function PortfolioEditorSections({
         {/* Content Tab */}
         <TabsContent value="content" className="mt-6">
           <DragDropContext onDragEnd={handleDragEnd}>
-            <Tabs value={orderedSections[0]?.id || "personal"} onValueChange={() => {}}>
+            <Tabs
+              value={orderedSections[0]?.id || "personal"}
+              onValueChange={() => {}}
+            >
               <Droppable droppableId="sections" direction="horizontal">
                 {(provided) => (
                   <TabsList
@@ -187,7 +213,11 @@ export default function PortfolioEditorSections({
                     className="grid grid-cols-6 w-full"
                   >
                     {orderedSections.map((section, index) => (
-                      <Draggable key={section.id} draggableId={section.id} index={index}>
+                      <Draggable
+                        key={section.id}
+                        draggableId={section.id}
+                        index={index}
+                      >
                         {(provided) => (
                           <TabsTrigger
                             ref={provided.innerRef}
@@ -209,10 +239,18 @@ export default function PortfolioEditorSections({
               {orderedSections.map((section) => {
                 const SectionComponent = section.component;
                 return (
-                  <TabsContent key={section.id} value={section.id} className="mt-6">
+                  <TabsContent
+                    key={section.id}
+                    value={section.id}
+                    className="mt-6"
+                  >
                     <SectionComponent
-                      data={portfolioData[section.id] || {}}
-                      onChange={(data: any) => handleSectionChange(section.id, data)}
+                      data={
+                        portfolioData[section.id as keyof PortfolioData] || {}
+                      }
+                      onChange={(data: Partial<PortfolioData>) =>
+                        handleSectionChange(section.id, data)
+                      }
                     />
                   </TabsContent>
                 );

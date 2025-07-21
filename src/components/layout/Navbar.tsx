@@ -1,11 +1,19 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-b-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -53,24 +61,41 @@ export default function Navbar() {
           >
             Pricing
           </Link>
-          <Link
-            to="/dashboard"
-            className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
-          >
-            Dashboard
-          </Link>
+          {user && (
+            <Link
+              to="/dashboard"
+              className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
+            >
+              Dashboard
+            </Link>
+          )}
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
           <ThemeToggle />
-          <Link to="/login">
-            <Button variant="ghost" size="sm">
-              Login
-            </Button>
-          </Link>
-          <Link to="/signup">
-            <Button size="sm">Sign up</Button>
-          </Link>
+          {user ? (
+            <>
+              <Link to="/dashboard">
+                <Button variant="ghost" size="sm">
+                  Dashboard
+                </Button>
+              </Link>
+              <Button onClick={handleLogout} size="sm">
+                Logout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button variant="ghost" size="sm">
+                  Login
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button size="sm">Sign up</Button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile menu button */}
@@ -90,7 +115,7 @@ export default function Navbar() {
             strokeLinejoin="round"
             className={cn(
               "transition-transform",
-              isMenuOpen ? "rotate-90" : "",
+              isMenuOpen ? "rotate-90" : ""
             )}
           >
             {isMenuOpen ? (
@@ -123,24 +148,41 @@ export default function Navbar() {
               >
                 Pricing
               </Link>
-              <Link
-                to="/dashboard"
-                className="text-sm font-medium text-foreground/80 hover:text-foreground"
-              >
-                Dashboard
-              </Link>
+              {user && (
+                <Link
+                  to="/dashboard"
+                  className="text-sm font-medium text-foreground/80 hover:text-foreground"
+                >
+                  Dashboard
+                </Link>
+              )}
               <div className="flex items-center py-2">
                 <ThemeToggle />
               </div>
               <div className="flex flex-col pt-2 space-y-2">
-                <Link to="/login" className="w-full">
-                  <Button variant="ghost" className="w-full">
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/signup" className="w-full">
-                  <Button className="w-full">Sign up</Button>
-                </Link>
+                {user ? (
+                  <>
+                    <Link to="/dashboard" className="w-full">
+                      <Button variant="ghost" className="w-full">
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <Button onClick={handleLogout} className="w-full">
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="w-full">
+                      <Button variant="ghost" className="w-full">
+                        Login
+                      </Button>
+                    </Link>
+                    <Link to="/signup" className="w-full">
+                      <Button className="w-full">Sign up</Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </div>
