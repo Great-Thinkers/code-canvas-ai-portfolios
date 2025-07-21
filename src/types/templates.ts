@@ -38,3 +38,48 @@ export interface TemplateCustomization {
     visibility: Record<string, boolean>;
   };
 }
+
+export interface PortfolioData {
+  personalInfo: {
+    name: string;
+    title: string;
+    bio: string;
+    email: string;
+    phone?: string;
+    location?: string;
+    profilePicture?: string;
+    socialLinks?: { platform: string; url: string }[];
+  };
+  projects?: {
+    title: string;
+    description: string;
+    technologies?: string[];
+    link?: string;
+    image?: string;
+  }[];
+  experience?: {
+    company: string;
+    role: string;
+    startDate: string;
+    endDate?: string;
+    description: string;
+  }[];
+  education?: {
+    institution: string;
+    degree: string;
+    startDate: string;
+    endDate?: string;
+  }[];
+  skills?: string[];
+  articles?: {
+    title: string;
+    summary: string;
+    link: string;
+    publicationDate: string;
+  }[];
+  seo?: {
+    title: string;
+    description: string;
+    keywords: string[];
+  };
+}
