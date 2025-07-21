@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +12,7 @@ interface SkillsSectionProps {
     skills?: string[];
     skillSummary?: string;
   };
-  onChange: (data: any) => void;
+  onChange: (data: { skills?: string[]; skillSummary?: string }) => void;
 }
 
 export default function SkillsSection({ data, onChange }: SkillsSectionProps) {
@@ -68,7 +67,11 @@ export default function SkillsSection({ data, onChange }: SkillsSectionProps) {
 
           <div className="flex flex-wrap gap-2">
             {(data.skills || []).map((skill, index) => (
-              <Badge key={index} variant="secondary" className="flex items-center gap-1">
+              <Badge
+                key={index}
+                variant="secondary"
+                className="flex items-center gap-1"
+              >
                 {skill}
                 <button
                   onClick={() => handleRemoveSkill(skill)}

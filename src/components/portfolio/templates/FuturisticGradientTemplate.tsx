@@ -1,13 +1,30 @@
 
 import { ReactNode } from 'react';
-import { TemplateTheme, TemplateCustomization } from '@/types/templates';
+import { TemplateTheme, TemplateCustomization, PortfolioData } from '@/types/templates';
 import BaseTemplate from './BaseTemplate';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Github, Linkedin, Twitter, Globe, Mail, MapPin, Calendar, ExternalLink } from 'lucide-react';
 
+interface Skill {
+  name: string;
+}
+
+interface Position {
+  company: string;
+  title: string;
+  startDate: string;
+  endDate?: string;
+  description: string;
+}
+
+interface Project {
+  name: string;
+  description: string;
+}
+
 interface FuturisticGradientTemplateProps {
-  portfolioData: any;
+  portfolioData: PortfolioData;
   template: TemplateTheme;
   customization?: TemplateCustomization;
   children: ReactNode;
@@ -104,7 +121,7 @@ export default function FuturisticGradientTemplate({
               <h2 className="text-3xl font-bold mb-4">Skill & Interest</h2>
               <div className="h-1 w-32 bg-gradient-to-r from-cyan-400 to-blue-400 mb-12"></div>
               <div className="flex flex-wrap gap-4">
-                {skills.technical.map((skill: any, index: number) => (
+                {skills.technical.map((skill: Skill, index: number) => (
                   <div
                     key={index}
                     className="px-6 py-3 border border-gray-600 rounded-full hover:border-cyan-400 transition-colors cursor-pointer"
@@ -131,7 +148,7 @@ export default function FuturisticGradientTemplate({
                 </div>
               </div>
               <div className="space-y-8">
-                {experience.positions.map((position: any, index: number) => (
+                {experience.positions.map((position: Position, index: number) => (
                   <div key={index} className="flex items-start gap-6">
                     <div className="text-cyan-400 text-2xl">»</div>
                     <div className="flex-1">
@@ -162,7 +179,7 @@ export default function FuturisticGradientTemplate({
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {projects.items.map((project: any, index: number) => (
+                {projects.items.map((project: Project, index: number) => (
                   <div key={index} className="group">
                     <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 h-64 mb-4">
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
