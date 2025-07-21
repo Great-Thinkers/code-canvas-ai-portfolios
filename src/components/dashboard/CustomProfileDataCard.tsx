@@ -1,57 +1,91 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { toast } from 'sonner';
-import { Plus, Edit, Trash2, User, Briefcase, GraduationCap, Award, Star, FolderOpen } from 'lucide-react';
-import { useCustomProfileData, CustomProfileData } from '@/hooks/useCustomProfileData';
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  User,
+  Briefcase,
+  GraduationCap,
+  Award,
+  Star,
+  FolderOpen,
+} from "lucide-react";
+import {
+  useCustomProfileData,
+  CustomProfileData,
+} from "@/hooks/useCustomProfileData";
 
 const PROFESSION_OPTIONS = [
-  'Software Developer',
-  'Designer',
-  'Writer',
-  'Marketer',
-  'Engineer', 
-  'Architect',
-  'Photographer',
-  'Project Manager',
-  'Data Scientist',
-  'Sales Professional',
-  'Other'
+  "Software Developer",
+  "Designer",
+  "Writer",
+  "Marketer",
+  "Engineer",
+  "Architect",
+  "Photographer",
+  "Project Manager",
+  "Data Scientist",
+  "Sales Professional",
+  "Other",
 ];
 
 const DATA_TYPE_OPTIONS = [
-  { value: 'experience', label: 'Work Experience', icon: Briefcase },
-  { value: 'project', label: 'Project', icon: FolderOpen },
-  { value: 'skill', label: 'Skill', icon: Star },
-  { value: 'education', label: 'Education', icon: GraduationCap },
-  { value: 'certification', label: 'Certification', icon: Award },
-  { value: 'award', label: 'Award', icon: Award },
+  { value: "experience", label: "Work Experience", icon: Briefcase },
+  { value: "project", label: "Project", icon: FolderOpen },
+  { value: "skill", label: "Skill", icon: Star },
+  { value: "education", label: "Education", icon: GraduationCap },
+  { value: "certification", label: "Certification", icon: Award },
+  { value: "award", label: "Award", icon: Award },
 ] as const;
 
 interface CustomDataFormProps {
-  onSubmit: (data: Omit<CustomProfileData, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => void;
+  onSubmit: (
+    data: Omit<
+      CustomProfileData,
+      "id" | "user_id" | "created_at" | "updated_at"
+    >
+  ) => void;
   onCancel: () => void;
   initialData?: Partial<CustomProfileData>;
 }
 
-const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, initialData }) => {
+const CustomDataForm: React.FC<CustomDataFormProps> = ({
+  onSubmit,
+  onCancel,
+  initialData,
+}) => {
   const [formData, setFormData] = useState({
-    profession: initialData?.profession || '',
-    data_type: initialData?.data_type || 'experience' as const,
-    title: initialData?.title || '',
-    organization: initialData?.organization || '',
-    description: initialData?.description || '',
-    start_date: initialData?.start_date || '',
-    end_date: initialData?.end_date || '',
+    profession: initialData?.profession || "",
+    data_type: initialData?.data_type || ("experience" as const),
+    title: initialData?.title || "",
+    organization: initialData?.organization || "",
+    description: initialData?.description || "",
+    start_date: initialData?.start_date || "",
+    end_date: initialData?.end_date || "",
     is_current: initialData?.is_current || false,
-    location: initialData?.location || '',
-    url: initialData?.url || '',
+    location: initialData?.location || "",
+    url: initialData?.url || "",
     skills: initialData?.skills || [],
     technologies: initialData?.technologies || [],
     achievements: initialData?.achievements || [],
@@ -64,19 +98,25 @@ const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, ini
     onSubmit(formData);
   };
 
-  const addArrayItem = (field: 'skills' | 'technologies' | 'achievements' | 'media_urls', value: string) => {
+  const addArrayItem = (
+    field: "skills" | "technologies" | "achievements" | "media_urls",
+    value: string
+  ) => {
     if (value.trim()) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [field]: [...prev[field], value.trim()]
+        [field]: [...prev[field], value.trim()],
       }));
     }
   };
 
-  const removeArrayItem = (field: 'skills' | 'technologies' | 'achievements' | 'media_urls', index: number) => {
-    setFormData(prev => ({
+  const removeArrayItem = (
+    field: "skills" | "technologies" | "achievements" | "media_urls",
+    index: number
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      [field]: prev[field].filter((_, i) => i !== index)
+      [field]: prev[field].filter((_, i) => i !== index),
     }));
   };
 
@@ -85,13 +125,20 @@ const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, ini
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="profession">Profession</Label>
-          <Select value={formData.profession} onValueChange={(value) => setFormData(prev => ({ ...prev, profession: value }))}>
+          <Select
+            value={formData.profession}
+            onValueChange={(value) =>
+              setFormData((prev) => ({ ...prev, profession: value }))
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select profession" />
             </SelectTrigger>
             <SelectContent>
-              {PROFESSION_OPTIONS.map(profession => (
-                <SelectItem key={profession} value={profession}>{profession}</SelectItem>
+              {PROFESSION_OPTIONS.map((profession) => (
+                <SelectItem key={profession} value={profession}>
+                  {profession}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -99,12 +146,20 @@ const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, ini
 
         <div>
           <Label htmlFor="data_type">Type</Label>
-          <Select value={formData.data_type} onValueChange={(value: any) => setFormData(prev => ({ ...prev, data_type: value }))}>
+          <Select
+            value={formData.data_type}
+            onValueChange={(value) =>
+              setFormData((prev) => ({
+                ...prev,
+                data_type: value as CustomProfileData["data_type"],
+              }))
+            }
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {DATA_TYPE_OPTIONS.map(option => (
+              {DATA_TYPE_OPTIONS.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -119,7 +174,9 @@ const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, ini
         <Input
           id="title"
           value={formData.title}
-          onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, title: e.target.value }))
+          }
           placeholder="e.g., Senior Software Engineer, Brand Identity Project"
           required
         />
@@ -130,7 +187,9 @@ const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, ini
         <Input
           id="organization"
           value={formData.organization}
-          onChange={(e) => setFormData(prev => ({ ...prev, organization: e.target.value }))}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, organization: e.target.value }))
+          }
           placeholder="e.g., Google, Personal Project"
         />
       </div>
@@ -140,7 +199,9 @@ const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, ini
         <Textarea
           id="description"
           value={formData.description}
-          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, description: e.target.value }))
+          }
           placeholder="Describe your role, project, or achievement..."
           rows={3}
         />
@@ -153,7 +214,9 @@ const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, ini
             id="start_date"
             type="date"
             value={formData.start_date}
-            onChange={(e) => setFormData(prev => ({ ...prev, start_date: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, start_date: e.target.value }))
+            }
           />
         </div>
         <div>
@@ -162,7 +225,9 @@ const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, ini
             id="end_date"
             type="date"
             value={formData.end_date}
-            onChange={(e) => setFormData(prev => ({ ...prev, end_date: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, end_date: e.target.value }))
+            }
             disabled={formData.is_current}
           />
         </div>
@@ -173,7 +238,9 @@ const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, ini
           type="checkbox"
           id="is_current"
           checked={formData.is_current}
-          onChange={(e) => setFormData(prev => ({ ...prev, is_current: e.target.checked }))}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, is_current: e.target.checked }))
+          }
           className="rounded"
         />
         <Label htmlFor="is_current">Currently active</Label>
@@ -185,7 +252,9 @@ const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, ini
           <Input
             id="location"
             value={formData.location}
-            onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, location: e.target.value }))
+            }
             placeholder="e.g., San Francisco, CA"
           />
         </div>
@@ -195,7 +264,9 @@ const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, ini
             id="url"
             type="url"
             value={formData.url}
-            onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, url: e.target.value }))
+            }
             placeholder="https://..."
           />
         </div>
@@ -203,18 +274,28 @@ const CustomDataForm: React.FC<CustomDataFormProps> = ({ onSubmit, onCancel, ini
 
       <div className="flex gap-2">
         <Button type="submit">Save</Button>
-        <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
       </div>
     </form>
   );
 };
 
 export const CustomProfileDataCard: React.FC = () => {
-  const { data, loading, addData, updateData, deleteData, getDataByType } = useCustomProfileData();
+  const { data, loading, addData, updateData, deleteData, getDataByType } =
+    useCustomProfileData();
   const [showForm, setShowForm] = useState(false);
-  const [editingItem, setEditingItem] = useState<CustomProfileData | null>(null);
+  const [editingItem, setEditingItem] = useState<CustomProfileData | null>(
+    null
+  );
 
-  const handleSubmit = async (formData: Omit<CustomProfileData, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
+  const handleSubmit = async (
+    formData: Omit<
+      CustomProfileData,
+      "id" | "user_id" | "created_at" | "updated_at"
+    >
+  ) => {
     if (editingItem) {
       await updateData(editingItem.id, formData);
       setEditingItem(null);
@@ -230,18 +311,18 @@ export const CustomProfileDataCard: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this item?')) {
+    if (confirm("Are you sure you want to delete this item?")) {
       await deleteData(id);
     }
   };
 
-  const getDataTypeIcon = (type: CustomProfileData['data_type']) => {
-    const option = DATA_TYPE_OPTIONS.find(opt => opt.value === type);
+  const getDataTypeIcon = (type: CustomProfileData["data_type"]) => {
+    const option = DATA_TYPE_OPTIONS.find((opt) => opt.value === type);
     return option ? option.icon : User;
   };
 
-  const getDataTypeLabel = (type: CustomProfileData['data_type']) => {
-    const option = DATA_TYPE_OPTIONS.find(opt => opt.value === type);
+  const getDataTypeLabel = (type: CustomProfileData["data_type"]) => {
+    const option = DATA_TYPE_OPTIONS.find((opt) => opt.value === type);
     return option ? option.label : type;
   };
 
@@ -271,7 +352,8 @@ export const CustomProfileDataCard: React.FC = () => {
               Custom Profile Data
             </CardTitle>
             <CardDescription>
-              Add custom information for professions without specific platform integrations
+              Add custom information for professions without specific platform
+              integrations
             </CardDescription>
           </div>
           <Button onClick={() => setShowForm(true)} disabled={showForm}>
@@ -284,7 +366,7 @@ export const CustomProfileDataCard: React.FC = () => {
         {showForm && (
           <div className="border rounded-lg p-4">
             <h3 className="font-medium mb-4">
-              {editingItem ? 'Edit Item' : 'Add New Item'}
+              {editingItem ? "Edit Item" : "Add New Item"}
             </h3>
             <CustomDataForm
               onSubmit={handleSubmit}
@@ -302,7 +384,8 @@ export const CustomProfileDataCard: React.FC = () => {
             <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="font-medium text-lg mb-2">No custom data yet</h3>
             <p className="text-muted-foreground mb-4">
-              Add your professional information, projects, skills, and achievements
+              Add your professional information, projects, skills, and
+              achievements
             </p>
             <Button onClick={() => setShowForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
@@ -314,20 +397,23 @@ export const CustomProfileDataCard: React.FC = () => {
             {data.map((item) => {
               const IconComponent = getDataTypeIcon(item.data_type);
               return (
-                <div key={item.id} className="flex items-start justify-between p-4 border rounded-lg">
+                <div
+                  key={item.id}
+                  className="flex items-start justify-between p-4 border rounded-lg"
+                >
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <IconComponent className="h-4 w-4" />
                       <Badge variant="outline">
                         {getDataTypeLabel(item.data_type)}
                       </Badge>
-                      <Badge variant="secondary">
-                        {item.profession}
-                      </Badge>
+                      <Badge variant="secondary">{item.profession}</Badge>
                     </div>
                     <h5 className="font-medium">{item.title}</h5>
                     {item.organization && (
-                      <p className="text-sm text-muted-foreground">{item.organization}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.organization}
+                      </p>
                     )}
                     {item.description && (
                       <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
@@ -337,20 +423,30 @@ export const CustomProfileDataCard: React.FC = () => {
                     <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                       {item.start_date && (
                         <span>
-                          {new Date(item.start_date).toLocaleDateString()} - {' '}
-                          {item.is_current ? 'Present' : item.end_date ? new Date(item.end_date).toLocaleDateString() : 'Present'}
+                          {new Date(item.start_date).toLocaleDateString()} -{" "}
+                          {item.is_current
+                            ? "Present"
+                            : item.end_date
+                            ? new Date(item.end_date).toLocaleDateString()
+                            : "Present"}
                         </span>
                       )}
-                      {item.location && (
-                        <span>• {item.location}</span>
-                      )}
+                      {item.location && <span>• {item.location}</span>}
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(item)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEdit(item)}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(item.id)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>

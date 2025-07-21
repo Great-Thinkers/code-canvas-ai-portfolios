@@ -1,7 +1,12 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -11,19 +16,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  Eye, 
-  Edit, 
-  Download, 
-  Share, 
-  MoreVertical, 
-  Trash2, 
-  Copy 
+import {
+  Eye,
+  Edit,
+  Download,
+  Share,
+  MoreVertical,
+  Trash2,
+  Copy,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import PortfolioExportDialog from "@/components/portfolio/PortfolioExportDialog";
+import { PortfolioData } from "@/types/templates";
 
 interface Portfolio {
   id: string;
@@ -33,7 +39,7 @@ interface Portfolio {
   is_published: boolean;
   created_at: string;
   updated_at: string;
-  portfolio_data: any;
+  portfolio_data: PortfolioData;
 }
 
 interface PortfolioCardProps {
@@ -41,7 +47,10 @@ interface PortfolioCardProps {
   onDelete: (id: string) => void;
 }
 
-export default function PortfolioCard({ portfolio, onDelete }: PortfolioCardProps) {
+export default function PortfolioCard({
+  portfolio,
+  onDelete,
+}: PortfolioCardProps) {
   const { user } = useAuth();
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -72,7 +81,7 @@ export default function PortfolioCard({ portfolio, onDelete }: PortfolioCardProp
 
   const handleDuplicate = async () => {
     if (!user) return;
-    
+
     try {
       // Fetch the original portfolio data
       const { data: originalData, error: fetchError } = await supabase
@@ -86,16 +95,14 @@ export default function PortfolioCard({ portfolio, onDelete }: PortfolioCardProp
       }
 
       // Create a duplicate with all required fields
-      const { error: createError } = await supabase
-        .from("portfolios")
-        .insert({
-          name: `${originalData.name} (Copy)`,
-          template_name: originalData.template_name,
-          template_id: originalData.template_id,
-          portfolio_data: originalData.portfolio_data,
-          user_id: user.id,
-          is_published: false,
-        });
+      const { error: createError } = await supabase.from("portfolios").insert({
+        name: `${originalData.name} (Copy)`,
+        template_name: originalData.template_name,
+        template_id: originalData.template_id,
+        portfolio_data: originalData.portfolio_data,
+        user_id: user.id,
+        is_published: false,
+      });
 
       if (createError) {
         throw new Error("Failed to create duplicate");
@@ -120,7 +127,9 @@ export default function PortfolioCard({ portfolio, onDelete }: PortfolioCardProp
               <div className="flex items-center gap-2 mt-2">
                 <Badge variant="outline">{portfolio.template_name}</Badge>
                 {portfolio.is_published && (
-                  <Badge className="bg-green-100 text-green-800">Published</Badge>
+                  <Badge className="bg-green-100 text-green-800">
+                    Published
+                  </Badge>
                 )}
               </div>
             </div>
@@ -140,7 +149,7 @@ export default function PortfolioCard({ portfolio, onDelete }: PortfolioCardProp
                   Export
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={handleDelete}
                   disabled={isDeleting}
                   className="text-destructive"
