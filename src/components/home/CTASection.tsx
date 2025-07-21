@@ -7,10 +7,10 @@ export default function CTASection() {
       <div className="container">
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-display font-semibold">
-            Ready to showcase your developer journey?
+            Ready to showcase your professional journey?
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Join thousands of developers who use CodeCanvas to create
+            Join thousands of professionals who use CodeCanvas to create
             professional portfolios that get noticed by recruiters and clients.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">

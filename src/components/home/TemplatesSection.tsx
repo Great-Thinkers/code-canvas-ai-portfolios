@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 const templates = [
   {
     name: "Modern Minimal",
-    role: "Frontend Developer",
+    role: "Frontend Professional",
     description:
       "Clean and minimalist design focused on showcasing UI/UX work and frontend skills",
     image: "/placeholder.svg",
@@ -14,7 +14,7 @@ const templates = [
   },
   {
     name: "Tech Stack",
-    role: "Full Stack Developer",
+    role: "Full Stack Professional",
     description:
       "Highlight your complete technology stack with visual indicators of proficiency",
     image: "/placeholder.svg",
@@ -22,7 +22,7 @@ const templates = [
   },
   {
     name: "Code Focus",
-    role: "Backend Engineer",
+    role: "Backend Specialist",
     description:
       "Emphasize your architecture designs and code quality with embedded snippets",
     image: "/placeholder.svg",

@@ -93,7 +93,7 @@ const generateAnalyticsData = (templates: Template[]): AnalyticsData => {
 
 const getRecommendedTemplates = (
   templates: Template[],
-  userRole?: string,
+  userRole?: string
 ): Template[] => {
   // Simple recommendation algorithm based on popularity and rating
   return templates
@@ -118,7 +118,7 @@ export default function TemplateAnalytics({
   const analyticsData = generateAnalyticsData(templates);
   const recommendedTemplates = getRecommendedTemplates(
     templates,
-    userRole || undefined,
+    userRole || undefined
   );
 
   const handleViewRecommendations = () => {
@@ -295,8 +295,8 @@ export default function TemplateAnalytics({
                             category.growth > 10
                               ? "default"
                               : category.growth > 0
-                                ? "secondary"
-                                : "destructive"
+                              ? "secondary"
+                              : "destructive"
                           }
                           className="text-xs"
                         >
@@ -342,8 +342,8 @@ export default function TemplateAnalytics({
                           template.change > 0
                             ? "default"
                             : template.change < 0
-                              ? "destructive"
-                              : "secondary"
+                            ? "destructive"
+                            : "secondary"
                         }
                         className="text-xs"
                       >
@@ -438,11 +438,11 @@ export default function TemplateAnalytics({
                     className="px-3 py-2 border rounded-md"
                   >
                     <option value="">All Roles</option>
-                    <option value="frontend">Frontend Developer</option>
-                    <option value="backend">Backend Engineer</option>
-                    <option value="fullstack">Full-stack Developer</option>
+                    <option value="frontend">Frontend Professional</option>
+                    <option value="backend">Backend Specialist</option>
+                    <option value="fullstack">Full-stack Professional</option>
                     <option value="designer">UI/UX Designer</option>
-                    <option value="mobile">Mobile Developer</option>
+                    <option value="mobile">Mobile Specialist</option>
                     <option value="devops">DevOps Engineer</option>
                   </select>
                   <Button variant="outline" onClick={handleViewRecommendations}>

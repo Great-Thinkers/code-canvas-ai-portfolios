@@ -25,11 +25,11 @@ interface FilterSectionProps {
 
 const roles = [
   { value: "all", label: "All Roles" },
-  { value: "frontend", label: "Frontend Developer" },
-  { value: "backend", label: "Backend Engineer" },
-  { value: "fullstack", label: "Full-stack Developer" },
+  { value: "frontend", label: "Frontend Professional" },
+  { value: "backend", label: "Backend Specialist" },
+  { value: "fullstack", label: "Full-stack Professional" },
   { value: "designer", label: "UI/UX Designer" },
-  { value: "mobile", label: "Mobile Developer" },
+  { value: "mobile", label: "Mobile Specialist" },
   { value: "devops", label: "DevOps Engineer" },
 ];
 
@@ -113,7 +113,7 @@ export default function FilterSection({
 
         {/* Role Filter */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Developer Role</label>
+          <label className="text-sm font-medium">Professional Role</label>
           <Select value={filters.role} onValueChange={handleRoleChange}>
             <SelectTrigger>
               <SelectValue />

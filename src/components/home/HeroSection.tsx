@@ -6,15 +6,15 @@ export default function HeroSection() {
     <div className="container flex flex-col items-center text-center py-12 md:py-24">
       <div className="max-w-3xl space-y-6">
         <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-brand-50 text-brand-700 mb-6">
-          <span className="mr-1">✨</span> Generate your developer portfolio in
-          minutes
+          <span className="mr-1">✨</span> Generate your professional portfolio
+          in minutes
         </div>
         <h1 className="text-4xl md:text-6xl font-display font-semibold gradient-text">
-          Showcase your code with AI-powered portfolios
+          Showcase your work with AI-powered portfolios
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          CodeCanvas syncs with your GitHub and LinkedIn to auto-generate
-          beautiful, professional developer portfolios that evolve as you grow.
+          CodeCanvas syncs with your favorite platforms to auto-generate
+          beautiful, professional portfolios that evolve as you grow.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
           <Link to="/signup">

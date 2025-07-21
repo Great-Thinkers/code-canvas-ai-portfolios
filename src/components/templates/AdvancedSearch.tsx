@@ -29,11 +29,11 @@ interface AdvancedSearchProps {
 
 const filterOptions = {
   roles: [
-    { id: "frontend", label: "Frontend Developer" },
-    { id: "backend", label: "Backend Engineer" },
-    { id: "fullstack", label: "Full-stack Developer" },
+    { id: "frontend", label: "Frontend Professional" },
+    { id: "backend", label: "Backend Specialist" },
+    { id: "fullstack", label: "Full-stack Professional" },
     { id: "designer", label: "UI/UX Designer" },
-    { id: "mobile", label: "Mobile Developer" },
+    { id: "mobile", label: "Mobile Specialist" },
     { id: "devops", label: "DevOps Engineer" },
     { id: "data", label: "Data Scientist" },
   ],
@@ -58,7 +58,7 @@ const filterOptions = {
   ],
   categories: [
     { id: "Portfolio", label: "Portfolio" },
-    { id: "Developer", label: "Developer" },
+    { id: "Professional", label: "Professional" },
     { id: "Design", label: "Design" },
     { id: "Mobile", label: "Mobile" },
     { id: "DevOps", label: "DevOps" },
