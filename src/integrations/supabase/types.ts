@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      auto_sync_settings: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          frequency: string
+          id: string
+          last_sync_at: string | null
+          sync_behance: boolean
+          sync_github: boolean
+          sync_linkedin: boolean
+          sync_medium: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          frequency?: string
+          id?: string
+          last_sync_at?: string | null
+          sync_behance?: boolean
+          sync_github?: boolean
+          sync_linkedin?: boolean
+          sync_medium?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          frequency?: string
+          id?: string
+          last_sync_at?: string | null
+          sync_behance?: boolean
+          sync_github?: boolean
+          sync_linkedin?: boolean
+          sync_medium?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       behance_profiles: {
         Row: {
           access_token: string | null
@@ -901,6 +943,53 @@ export type Database = {
           username?: string
         }
         Relationships: []
+      }
+      portfolio_analytics: {
+        Row: {
+          country: string | null
+          created_at: string
+          device_type: string | null
+          event_type: string
+          id: string
+          portfolio_id: string | null
+          referrer: string | null
+          user_id: string | null
+          visitor_ip: string | null
+          visitor_user_agent: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          event_type: string
+          id?: string
+          portfolio_id?: string | null
+          referrer?: string | null
+          user_id?: string | null
+          visitor_ip?: string | null
+          visitor_user_agent?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          event_type?: string
+          id?: string
+          portfolio_id?: string | null
+          referrer?: string | null
+          user_id?: string | null
+          visitor_ip?: string | null
+          visitor_user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_analytics_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       portfolio_exports: {
         Row: {

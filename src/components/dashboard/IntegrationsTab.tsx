@@ -2,6 +2,9 @@
 import IntegrationCard from "@/components/dashboard/IntegrationCard";
 import EnhancedGitHubIntegration from "@/components/dashboard/EnhancedGitHubIntegration";
 import EnhancedLinkedInIntegration from "@/components/dashboard/EnhancedLinkedInIntegration";
+import { BehanceIntegrationCard } from "./BehanceIntegrationCard";
+import { MediumIntegrationCard } from "./MediumIntegrationCard";
+import { CustomProfileDataCard } from "./CustomProfileDataCard";
 import { useToast } from "@/components/ui/use-toast";
 import { useGitHubIntegration } from "@/hooks/useGitHubIntegration";
 import { useLinkedInIntegration } from "@/hooks/useLinkedInIntegration";
@@ -160,8 +163,12 @@ export default function IntegrationsTab() {
         </TabsList>
 
         <TabsContent value="connections">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <IntegrationCard
+          <div className="space-y-8">
+            {/* Main Integrations */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Platform Integrations</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <IntegrationCard
               name="GitHub"
               icon={
                 <svg
@@ -215,6 +222,23 @@ export default function IntegrationsTab() {
               lastSynced={linkedinProfile?.last_synced_at}
               profileData={linkedinProfile}
             />
+              </div>
+            </div>
+
+            {/* Creative Platform Integrations */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Creative & Writing Platforms</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <BehanceIntegrationCard />
+                <MediumIntegrationCard />
+              </div>
+            </div>
+
+            {/* Custom Data */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Custom Professional Data</h3>
+              <CustomProfileDataCard />
+            </div>
           </div>
         </TabsContent>
 

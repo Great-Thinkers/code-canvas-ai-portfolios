@@ -39,7 +39,7 @@ export function useAutoSync() {
       if (data) {
         setSettings({
           enabled: data.enabled,
-          frequency: data.frequency,
+          frequency: data.frequency as 'hourly' | 'daily' | 'weekly',
           lastSync: data.last_sync_at,
           syncGitHub: data.sync_github,
           syncLinkedIn: data.sync_linkedin
