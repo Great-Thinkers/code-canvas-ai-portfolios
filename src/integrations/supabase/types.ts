@@ -7,8 +7,231 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   public: {
     Tables: {
+      behance_profiles: {
+        Row: {
+          access_token: string | null
+          appreciations: number | null
+          avatar_url: string | null
+          behance_user_id: string
+          biography: string | null
+          city: string | null
+          company: string | null
+          country: string | null
+          cover_image_url: string | null
+          created_at: string
+          display_name: string | null
+          followers_count: number | null
+          following_count: number | null
+          id: string
+          last_synced_at: string | null
+          project_views: number | null
+          refresh_token: string | null
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+          username: string
+          website: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          appreciations?: number | null
+          avatar_url?: string | null
+          behance_user_id: string
+          biography?: string | null
+          city?: string | null
+          company?: string | null
+          country?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          followers_count?: number | null
+          following_count?: number | null
+          id?: string
+          last_synced_at?: string | null
+          project_views?: number | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+          username: string
+          website?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          appreciations?: number | null
+          avatar_url?: string | null
+          behance_user_id?: string
+          biography?: string | null
+          city?: string | null
+          company?: string | null
+          country?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          followers_count?: number | null
+          following_count?: number | null
+          id?: string
+          last_synced_at?: string | null
+          project_views?: number | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+          username?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      behance_projects: {
+        Row: {
+          appreciations: number | null
+          behance_profile_id: string
+          comments: number | null
+          covers: Json | null
+          created_at: string
+          created_on: string | null
+          description: string | null
+          fields: string[] | null
+          id: string
+          modified_on: string | null
+          modules: Json | null
+          name: string
+          privacy: string | null
+          project_id: number
+          published_on: string | null
+          stats: Json | null
+          tags: string[] | null
+          updated_at: string
+          url: string
+          views: number | null
+        }
+        Insert: {
+          appreciations?: number | null
+          behance_profile_id: string
+          comments?: number | null
+          covers?: Json | null
+          created_at?: string
+          created_on?: string | null
+          description?: string | null
+          fields?: string[] | null
+          id?: string
+          modified_on?: string | null
+          modules?: Json | null
+          name: string
+          privacy?: string | null
+          project_id: number
+          published_on?: string | null
+          stats?: Json | null
+          tags?: string[] | null
+          updated_at?: string
+          url: string
+          views?: number | null
+        }
+        Update: {
+          appreciations?: number | null
+          behance_profile_id?: string
+          comments?: number | null
+          covers?: Json | null
+          created_at?: string
+          created_on?: string | null
+          description?: string | null
+          fields?: string[] | null
+          id?: string
+          modified_on?: string | null
+          modules?: Json | null
+          name?: string
+          privacy?: string | null
+          project_id?: number
+          published_on?: string | null
+          stats?: Json | null
+          tags?: string[] | null
+          updated_at?: string
+          url?: string
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "behance_projects_behance_profile_id_fkey"
+            columns: ["behance_profile_id"]
+            isOneToOne: false
+            referencedRelation: "behance_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_profile_data: {
+        Row: {
+          achievements: string[] | null
+          created_at: string
+          data_type: string
+          description: string | null
+          end_date: string | null
+          id: string
+          is_current: boolean | null
+          location: string | null
+          media_urls: string[] | null
+          metadata: Json | null
+          organization: string | null
+          profession: string
+          skills: string[] | null
+          start_date: string | null
+          technologies: string[] | null
+          title: string
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          achievements?: string[] | null
+          created_at?: string
+          data_type: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          location?: string | null
+          media_urls?: string[] | null
+          metadata?: Json | null
+          organization?: string | null
+          profession: string
+          skills?: string[] | null
+          start_date?: string | null
+          technologies?: string[] | null
+          title: string
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          achievements?: string[] | null
+          created_at?: string
+          data_type?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          location?: string | null
+          media_urls?: string[] | null
+          metadata?: Json | null
+          organization?: string | null
+          profession?: string
+          skills?: string[] | null
+          start_date?: string | null
+          technologies?: string[] | null
+          title?: string
+          updated_at?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       github_commits: {
         Row: {
           additions: number | null
@@ -551,6 +774,134 @@ export type Database = {
         }
         Relationships: []
       }
+      medium_articles: {
+        Row: {
+          article_id: string
+          canonical_url: string | null
+          claps: number | null
+          content_preview: string | null
+          created_at: string
+          id: string
+          license: string | null
+          license_url: string | null
+          medium_profile_id: string
+          published_at: string | null
+          reading_time: number | null
+          subtitle: string | null
+          tags: string[] | null
+          title: string
+          topics: string[] | null
+          updated_at: string
+          updated_at_medium: string | null
+          url: string
+          word_count: number | null
+        }
+        Insert: {
+          article_id: string
+          canonical_url?: string | null
+          claps?: number | null
+          content_preview?: string | null
+          created_at?: string
+          id?: string
+          license?: string | null
+          license_url?: string | null
+          medium_profile_id: string
+          published_at?: string | null
+          reading_time?: number | null
+          subtitle?: string | null
+          tags?: string[] | null
+          title: string
+          topics?: string[] | null
+          updated_at?: string
+          updated_at_medium?: string | null
+          url: string
+          word_count?: number | null
+        }
+        Update: {
+          article_id?: string
+          canonical_url?: string | null
+          claps?: number | null
+          content_preview?: string | null
+          created_at?: string
+          id?: string
+          license?: string | null
+          license_url?: string | null
+          medium_profile_id?: string
+          published_at?: string | null
+          reading_time?: number | null
+          subtitle?: string | null
+          tags?: string[] | null
+          title?: string
+          topics?: string[] | null
+          updated_at?: string
+          updated_at_medium?: string | null
+          url?: string
+          word_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medium_articles_medium_profile_id_fkey"
+            columns: ["medium_profile_id"]
+            isOneToOne: false
+            referencedRelation: "medium_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medium_profiles: {
+        Row: {
+          access_token: string | null
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          followers_count: number | null
+          following_count: number | null
+          id: string
+          last_synced_at: string | null
+          medium_user_id: string
+          name: string | null
+          refresh_token: string | null
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          access_token?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          followers_count?: number | null
+          following_count?: number | null
+          id?: string
+          last_synced_at?: string | null
+          medium_user_id: string
+          name?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          access_token?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          followers_count?: number | null
+          following_count?: number | null
+          id?: string
+          last_synced_at?: string | null
+          medium_user_id?: string
+          name?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
       portfolio_exports: {
         Row: {
           created_at: string
@@ -811,21 +1162,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -843,14 +1198,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -866,14 +1223,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -889,14 +1248,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -904,14 +1265,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
