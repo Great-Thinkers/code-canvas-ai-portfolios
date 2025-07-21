@@ -23,7 +23,10 @@ interface ExperienceSectionProps {
     experiences?: Experience[];
     experienceSummary?: string;
   };
-  onChange: (data: any) => void;
+  onChange: (data: {
+    experiences?: Experience[];
+    experienceSummary?: string;
+  }) => void;
 }
 
 export default function ExperienceSection({
@@ -254,7 +257,9 @@ export default function ExperienceSection({
             </div>
             <Button
               onClick={
-                editingIndex !== null ? handleUpdateExperience : handleAddExperience
+                editingIndex !== null
+                  ? handleUpdateExperience
+                  : handleAddExperience
               }
               disabled={!currentExperience.title || !currentExperience.company}
             >

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,45 +25,56 @@ interface ProjectsSectionProps {
   onChange: (data: { projects: Project[] }) => void;
 }
 
-export default function ProjectsSection({ data, onChange }: ProjectsSectionProps) {
+export default function ProjectsSection({
+  data,
+  onChange,
+}: ProjectsSectionProps) {
   const [aiDialogProject, setAiDialogProject] = useState<string | null>(null);
   const projects = data.projects || [];
 
   const addProject = () => {
     const newProject: Project = {
       id: crypto.randomUUID(),
-      name: '',
-      description: '',
+      name: "",
+      description: "",
       technologies: [],
     };
     onChange({ projects: [...projects, newProject] });
   };
 
   const removeProject = (id: string) => {
-    onChange({ projects: projects.filter(p => p.id !== id) });
+    onChange({ projects: projects.filter((p) => p.id !== id) });
   };
 
-  const updateProject = (id: string, field: keyof Project, value: any) => {
+  const updateProject = (
+    id: string,
+    field: keyof Project,
+    value: Project[keyof Project]
+  ) => {
     onChange({
-      projects: projects.map(p => 
+      projects: projects.map((p) =>
         p.id === id ? { ...p, [field]: value } : p
-      )
+      ),
     });
   };
 
   const addTechnology = (projectId: string, tech: string) => {
     if (!tech.trim()) return;
-    
-    const project = projects.find(p => p.id === projectId);
+
+    const project = projects.find((p) => p.id === projectId);
     if (project && !project.technologies.includes(tech)) {
-      updateProject(projectId, 'technologies', [...project.technologies, tech]);
+      updateProject(projectId, "technologies", [...project.technologies, tech]);
     }
   };
 
   const removeTechnology = (projectId: string, tech: string) => {
-    const project = projects.find(p => p.id === projectId);
+    const project = projects.find((p) => p.id === projectId);
     if (project) {
-      updateProject(projectId, 'technologies', project.technologies.filter(t => t !== tech));
+      updateProject(
+        projectId,
+        "technologies",
+        project.technologies.filter((t) => t !== tech)
+      );
     }
   };
 
@@ -77,7 +87,7 @@ export default function ProjectsSection({ data, onChange }: ProjectsSectionProps
   });
 
   const handleAIDescriptionGenerated = (projectId: string, content: string) => {
-    updateProject(projectId, 'description', content);
+    updateProject(projectId, "description", content);
   };
 
   return (
@@ -117,7 +127,9 @@ export default function ProjectsSection({ data, onChange }: ProjectsSectionProps
                     <Label>Project Name</Label>
                     <Input
                       value={project.name}
-                      onChange={(e) => updateProject(project.id, 'name', e.target.value)}
+                      onChange={(e) =>
+                        updateProject(project.id, "name", e.target.value)
+                      }
                       placeholder="My Awesome Project"
                     />
                   </div>
@@ -127,7 +139,13 @@ export default function ProjectsSection({ data, onChange }: ProjectsSectionProps
                       <input
                         type="checkbox"
                         checked={project.featured || false}
-                        onChange={(e) => updateProject(project.id, 'featured', e.target.checked)}
+                        onChange={(e) =>
+                          updateProject(
+                            project.id,
+                            "featured",
+                            e.target.checked
+                          )
+                        }
                         className="rounded"
                       />
                       <span className="text-sm">Highlight this project</span>
@@ -142,7 +160,9 @@ export default function ProjectsSection({ data, onChange }: ProjectsSectionProps
                       <AIContentButton
                         contentType="project"
                         context={getProjectContext(project)}
-                        onContentGenerated={(content) => handleAIDescriptionGenerated(project.id, content)}
+                        onContentGenerated={(content) =>
+                          handleAIDescriptionGenerated(project.id, content)
+                        }
                         size="sm"
                       >
                         Generate Description
@@ -150,7 +170,9 @@ export default function ProjectsSection({ data, onChange }: ProjectsSectionProps
                       <AIContentButton
                         contentType="project"
                         context={getProjectContext(project)}
-                        onContentGenerated={() => setAiDialogProject(project.id)}
+                        onContentGenerated={() =>
+                          setAiDialogProject(project.id)
+                        }
                         variant="ghost"
                         size="sm"
                       >
@@ -160,7 +182,9 @@ export default function ProjectsSection({ data, onChange }: ProjectsSectionProps
                   </div>
                   <Textarea
                     value={project.description}
-                    onChange={(e) => updateProject(project.id, 'description', e.target.value)}
+                    onChange={(e) =>
+                      updateProject(project.id, "description", e.target.value)
+                    }
                     placeholder="Describe your project, the technologies used, challenges solved, and its impact..."
                     className="min-h-[100px]"
                   />
@@ -170,16 +194,20 @@ export default function ProjectsSection({ data, onChange }: ProjectsSectionProps
                   <div className="space-y-2">
                     <Label>Live URL</Label>
                     <Input
-                      value={project.liveUrl || ''}
-                      onChange={(e) => updateProject(project.id, 'liveUrl', e.target.value)}
+                      value={project.liveUrl || ""}
+                      onChange={(e) =>
+                        updateProject(project.id, "liveUrl", e.target.value)
+                      }
                       placeholder="https://myproject.com"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label>GitHub URL</Label>
                     <Input
-                      value={project.githubUrl || ''}
-                      onChange={(e) => updateProject(project.id, 'githubUrl', e.target.value)}
+                      value={project.githubUrl || ""}
+                      onChange={(e) =>
+                        updateProject(project.id, "githubUrl", e.target.value)
+                      }
                       placeholder="https://github.com/username/project"
                     />
                   </div>
@@ -188,8 +216,10 @@ export default function ProjectsSection({ data, onChange }: ProjectsSectionProps
                 <div className="space-y-2">
                   <Label>Project Image URL</Label>
                   <Input
-                    value={project.imageUrl || ''}
-                    onChange={(e) => updateProject(project.id, 'imageUrl', e.target.value)}
+                    value={project.imageUrl || ""}
+                    onChange={(e) =>
+                      updateProject(project.id, "imageUrl", e.target.value)
+                    }
                     placeholder="https://example.com/project-screenshot.jpg"
                   />
                 </div>
@@ -198,7 +228,11 @@ export default function ProjectsSection({ data, onChange }: ProjectsSectionProps
                   <Label>Technologies</Label>
                   <div className="flex flex-wrap gap-2 mb-2">
                     {project.technologies.map((tech) => (
-                      <Badge key={tech} variant="secondary" className="flex items-center gap-1">
+                      <Badge
+                        key={tech}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
                         {tech}
                         <X
                           className="h-3 w-3 cursor-pointer"
@@ -210,9 +244,9 @@ export default function ProjectsSection({ data, onChange }: ProjectsSectionProps
                   <Input
                     placeholder="Type a technology and press Enter"
                     onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         addTechnology(project.id, e.currentTarget.value);
-                        e.currentTarget.value = '';
+                        e.currentTarget.value = "";
                       }
                     }}
                   />
@@ -228,9 +262,15 @@ export default function ProjectsSection({ data, onChange }: ProjectsSectionProps
           open={!!aiDialogProject}
           onOpenChange={() => setAiDialogProject(null)}
           contentType="project"
-          context={getProjectContext(projects.find(p => p.id === aiDialogProject)!)}
-          onAccept={(content) => handleAIDescriptionGenerated(aiDialogProject, content)}
-          initialContent={projects.find(p => p.id === aiDialogProject)?.description}
+          context={getProjectContext(
+            projects.find((p) => p.id === aiDialogProject)!
+          )}
+          onAccept={(content) =>
+            handleAIDescriptionGenerated(aiDialogProject, content)
+          }
+          initialContent={
+            projects.find((p) => p.id === aiDialogProject)?.description
+          }
         />
       )}
     </div>
